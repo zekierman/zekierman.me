@@ -1,20 +1,30 @@
 ---
-// A cursor for this site.
-//
-// A seagull was the obvious idea and it is the wrong one: at sixteen pixels the
-// halftone mark is an unreadable smudge, and putting the brand on the pointer
-// cheapens it. What the pointer can usefully carry is a word — the same word the
-// Lab writes on everything else it labels. So it is a small ring that names what
-// is under it: VIEW over a project, EXP over an experiment, OPEN over a link
-// that leaves.
-//
-// It is a progressive enhancement and nothing depends on it. The native cursor
-// is only hidden once this one is actually running, so a failure anywhere above
-// leaves a working pointer rather than an invisible one.
+import { getCopy, type Locale } from '../content/copy';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = getCopy(locale).hero;
 ---
 
-<div class="cursor" data-cursor-root aria-hidden="true">
-  <span class="ring" data-cursor-ring></span>
+{/* A cursor that carries the word inside it.
+
+    Two earlier attempts failed, and both for reasons worth writing down. A thin
+    outlined ring read as a scratch rather than an object. And both reached for
+    `mix-blend-mode: difference`, which is the reflex here and is wrong on this
+    page: difference against white gives rgb(5,12,28) over the cream and
+    rgb(56,87,158) over the gold — a navy and a bright indigo that exist nowhere
+    in this palette. The pointer was inventing colours the site does not own.
+
+    So there is no blend mode. The cursor asks which world it is over and takes
+    its colours from the tokens: cream on the dark, ink on the paper.
+
+    The word sits inside it rather than beside it. A label alongside splits the
+    eye between two floating objects; inside, the pointer is one thing that names
+    itself. A circle big enough to hold "VIEW" would be about 60px across and a
+    blind spot over the film — a capsule holds the same word at 24px tall. */}
+<div class="cursor" data-cursor-root data-scroll-word={t.scrollLabel} aria-hidden="true">
   <span class="label" data-cursor-label></span>
 </div>
 
@@ -24,15 +34,30 @@
     top: 0;
     left: 0;
     z-index: 90;
-    display: flex;
-    align-items: center;
-    gap: 0.55rem;
-    /* Never in the way of what it is pointing at. */
+    display: grid;
+    place-items: center;
+
+    /* Idle: a small solid lozenge. Solid, because an outline at this size reads
+       as a scratch; a lozenge rather than a dot, because it is already the shape
+       it is about to become. */
+    width: 14px;
+    height: 10px;
+    border-radius: 999px;
+
     pointer-events: none;
     opacity: 0;
-    transition: opacity 0.25s var(--ease-out);
-    /* Off until the script decides this pointer deserves it. */
     visibility: hidden;
+
+    /* Set per world by the script — see paintFor(). */
+    background: var(--cursor-fill, var(--color-light));
+    color: var(--cursor-ink, var(--color-ink));
+
+    will-change: transform;
+    transition:
+      width 0.32s var(--ease-out),
+      height 0.32s var(--ease-out),
+      opacity 0.25s var(--ease-out),
+      background-color 0.3s var(--ease-out);
   }
 
   :global(html[data-pointer='on']) .cursor {
@@ -40,88 +65,43 @@
     opacity: 1;
   }
 
-  /* Only where the ring is genuinely drawn, and only on a fine pointer. Hiding
-     the system cursor is not free — some people have chosen a large or
-     high-contrast one deliberately — so it is hidden as narrowly as possible. */
+  /* The system cursor is hidden only where this one is genuinely drawn. Some
+     people have chosen a large or high-contrast pointer deliberately, so the
+     override stays as narrow as it can be. */
   :global(html[data-pointer='on']),
   :global(html[data-pointer='on'] a),
   :global(html[data-pointer='on'] button) {
     cursor: none;
   }
 
-  /* A registration mark, not a dot.
-     It is what a press uses to line one colour up with the next — the mark that
-     says "this is exactly here". It belongs to the same world as the halftone
-     the brand is built from, it is thinner than a ring, and unlike a circle it
-     actually points at something. */
-  .ring {
-    display: block;
-    position: relative;
-    width: 15px;
-    height: 15px;
-    margin: -7.5px 0 0 -7.5px;
-    transition: transform 0.35s var(--ease-out);
-  }
-
-  .ring::before,
-  .ring::after {
-    content: '';
-    position: absolute;
-    background: currentColor;
-    transition:
-      inset 0.35s var(--ease-out),
-      opacity 0.3s var(--ease-out);
-  }
-
-  /* Two hairlines crossing, with the centre left open so the mark sits over what
-     it is pointing at rather than covering it. */
-  .ring::before {
-    left: 0;
-    right: 0;
-    top: 50%;
-    height: 1px;
-    margin-top: -0.5px;
-    clip-path: polygon(0 0, 38% 0, 38% 100%, 0 100%, 100% 100%, 62% 100%, 62% 0, 100% 0);
-  }
-
-  .ring::after {
-    top: 0;
-    bottom: 0;
-    left: 50%;
-    width: 1px;
-    margin-left: -0.5px;
-    clip-path: polygon(0 0, 100% 0, 100% 38%, 0 38%, 0 100%, 100% 100%, 100% 62%, 0 62%);
-  }
-
-  /* Over a target the mark turns onto its diagonal and closes in: the same
-     gesture a press makes when it locks registration. */
-  .cursor[data-showing] .ring {
-    transform: rotate(45deg) scale(0.72);
+  /* Over something that can be opened, it opens: one shape, one continuous
+     change, the word arriving as the room for it appears. */
+  .cursor[data-showing] {
+    width: 3.9rem;
+    height: 1.55rem;
   }
 
   .label {
     font-family: var(--font-mono);
-    font-size: 0.58rem;
-    letter-spacing: 0.22em;
+    font-size: 0.56rem;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
     white-space: nowrap;
     opacity: 0;
-    transform: translateX(-0.25rem);
-    transition:
-      opacity 0.25s var(--ease-out),
-      transform 0.25s var(--ease-out);
+    transition: opacity 0.18s var(--ease-out);
   }
 
   .cursor[data-showing] .label {
     opacity: 1;
-    transform: none;
+    /* Let the capsule finish opening before the word lands in it. */
+    transition-delay: 0.1s;
   }
 
-  /* The page is two worlds and the pointer crosses both. `difference` is what the
-     index and the language switch already use to stay legible over either. */
-  .cursor {
-    color: var(--color-light);
-    mix-blend-mode: difference;
+  @media (prefers-reduced-motion: reduce) {
+    .cursor,
+    .label {
+      transition: none;
+    }
   }
 </style>
 
@@ -129,31 +109,42 @@
   const root = document.querySelector<HTMLElement>('[data-cursor-root]');
   const label = document.querySelector<HTMLElement>('[data-cursor-label]');
 
-  // A ring that trails a finger is nonsense, and a pointer is not something to
-  // animate at someone who asked for less motion. Both cases keep the real one.
+  // A capsule trailing a finger is nonsense; a pointer is not something to
+  // animate at someone who asked for stillness; and a forced-colours mode has
+  // already been told how a pointer should look. All three keep the real one.
   const fine = matchMedia('(hover: hover) and (pointer: fine)');
   const calm = matchMedia('(prefers-reduced-motion: reduce)');
-  // Someone running a forced-colours mode has told the system how a pointer
-  // should look. That is not ours to override.
   const forced = matchMedia('(forced-colors: active)');
 
   if (root && label && fine.matches && !calm.matches && !forced.matches) {
+    const scrollWord = root.dataset.scrollWord ?? '';
+    /** Past this the invitation has been taken, and repeating it is nagging. */
+    const asked = () => scrollY < innerHeight * 0.2;
+
     let targetX = 0;
     let targetY = 0;
     let x = 0;
     let y = 0;
+    let last = 0;
     let running = false;
     let placed = false;
+    let over: Element | null = null;
 
     /**
-     * What the thing under the pointer calls itself, or null over plain page.
+     * What is under the pointer, or null over plain page.
      *
-     * Only ever asked about things that can actually be opened. The pointer
-     * naming something inert reads as a promise the page does not keep.
+     * The hero is the one inert thing that gets a word. Nothing on this site
+     * happens until someone scrolls, and three people were shown the hero and
+     * none of them did — so the pointer asks too, and stops asking the moment it
+     * is obeyed.
      */
     function labelFor(element: Element | null): string | null {
       const hit = element?.closest('a, button, [data-row], summary');
-      if (!hit) return null;
+
+      if (!hit) {
+        if (scrollWord && asked() && element?.closest('#the-door')) return scrollWord;
+        return null;
+      }
 
       const declared = hit.getAttribute('data-cursor');
       if (declared) return declared;
@@ -167,16 +158,38 @@
       return null;
     }
 
-    // Eased, so the ring reads as something following rather than something
-    // welded to the pointer — which is also what makes the label legible while
-    // the hand is still moving.
-    const tick = () => {
-      x += (targetX - x) * 0.22;
-      y += (targetY - y) * 0.22;
-      root.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+    /** The film and the footer are dark; everything between them is paper. */
+    function paintFor(element: Element | null) {
+      const dark = element?.closest('#the-door, #another-door, .threshold');
+      root!.style.setProperty('--cursor-fill', dark ? 'var(--color-light)' : 'var(--color-ink)');
+      root!.style.setProperty('--cursor-ink', dark ? 'var(--color-ink)' : 'var(--color-light)');
+    }
+
+    function apply(element: Element | null) {
+      const name = labelFor(element);
+      if (name) {
+        root!.dataset.showing = '';
+        if (label!.textContent !== name) label!.textContent = name;
+      } else {
+        delete root!.dataset.showing;
+      }
+    }
+
+    // Eased toward the pointer rather than welded to it: the lag is what keeps a
+    // word legible while the hand is still moving. Normalised against the frame
+    // time, so a 120Hz screen does not run it at twice the speed of a 60Hz one.
+    const tick = (now: number) => {
+      const dt = last ? Math.min(now - last, 64) : 16.7;
+      last = now;
+      const factor = 1 - Math.pow(1 - 0.22, dt / 16.7);
+
+      x += (targetX - x) * factor;
+      y += (targetY - y) * factor;
+      root!.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
 
       if (Math.abs(targetX - x) < 0.05 && Math.abs(targetY - y) < 0.05) {
         running = false;
+        last = 0;
         return;
       }
       requestAnimationFrame(tick);
@@ -191,8 +204,8 @@
     document.addEventListener(
       'pointermove',
       (event) => {
-        // A pen or a finger reaching a device that also has a mouse: leave the
-        // ring where it is and let the real pointer take over.
+        // A pen or a finger on a machine that also has a mouse: let the real
+        // pointer take over rather than racing it.
         if (event.pointerType !== 'mouse') return;
 
         targetX = event.clientX;
@@ -206,25 +219,25 @@
         }
         start();
 
-        const name = labelFor(event.target as Element);
-        if (name) {
-          root.dataset.showing = '';
-          if (label.textContent !== name) label.textContent = name;
-        } else {
-          delete root.dataset.showing;
-        }
+        over = event.target as Element;
+        paintFor(over);
+        apply(over);
       },
       { passive: true },
     );
 
-    // Off the window, out of the document, or into another tab: the ring should
-    // not be left sitting somewhere the pointer is not.
+    // The hero's word has to leave as the page moves, not only when the hand
+    // does — otherwise it sits there through the whole film.
+    addEventListener('scroll', () => apply(over), { passive: true });
+
+    // Off the window, out of the document, or into another tab: the capsule
+    // should not be left sitting where the pointer is not.
     const hide = () => {
       delete document.documentElement.dataset.pointer;
       placed = false;
     };
     document.addEventListener('pointerleave', hide);
-    window.addEventListener('blur', hide);
+    addEventListener('blur', hide);
     document.addEventListener('pointerdown', (event) => {
       if (event.pointerType !== 'mouse') hide();
     });

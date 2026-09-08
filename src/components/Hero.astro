@@ -271,12 +271,13 @@ const t = getCopy(locale).hero;
   .hint-rail {
     position: relative;
     display: block;
-    width: 1px;
+    width: 2px;
     height: 4.6rem;
     overflow: hidden;
+    border-radius: 1px;
     background: linear-gradient(
       to bottom,
-      color-mix(in srgb, var(--color-light) 52%, transparent),
+      color-mix(in srgb, var(--color-light) 60%, transparent),
       transparent
     );
   }
@@ -285,12 +286,12 @@ const t = getCopy(locale).hero;
      earns it: it is not decoration, it is the instruction. */
   .hint-bead {
     position: absolute;
-    left: -2.5px;
-    width: 6px;
-    height: 6px;
+    left: -3px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     background: var(--color-light);
-    box-shadow: 0 0 8px rgb(0 0 0 / 0.55);
+    box-shadow: 0 0 10px rgb(0 0 0 / 0.6);
     animation: hint-fall 2.2s var(--ease-out) infinite;
   }
 
