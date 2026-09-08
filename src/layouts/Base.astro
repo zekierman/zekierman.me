@@ -1,5 +1,6 @@
 ---
 import { Font } from 'astro:assets';
+import { getCollection } from 'astro:content';
 import { getCopy, type Locale } from '../content/copy';
 import '../styles/global.css';
 
@@ -15,7 +16,48 @@ const canonical = new URL(Astro.url.pathname, site);
 const trUrl = new URL('/', site);
 const enUrl = new URL('/en/', site);
 const ogImage = new URL('/media/og.jpg', site);
+
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+
+const mailto = t.profile.links.find((l) => l.href.startsWith('mailto:'));
+const email = mailto ? mailto.href.replace(/^mailto:/, '') : undefined;
+const sameAs = t.profile.links
+  .filter((l) => l.href && !l.href.startsWith('mailto:'))
+  .map((l) => l.href);
+
+const roleSkills = t.arrival.role.split('·').map((s) => s.trim());
+const labTechs = [
+  ...new Set(
+    t.lab.items.flatMap((item) => [...item.meta.matchAll(/\[(.+?)\]/g)].map((m) => m[1]))
+  ),
+];
+const projectNames = projects.map((p) => p.data[locale].name);
+const knowsAbout = [...roleSkills, ...labTechs, ...projectNames];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfilePage',
+  url: canonical.href,
+  name: t.meta.title,
+  description: t.meta.description,
+  inLanguage: locale === 'tr' ? 'tr-TR' : 'en-US',
+  mainEntity: {
+    '@type': 'Person',
+    name: t.profile.name,
+    url: new URL(locale === 'en' ? '/en/' : '/', site).href,
+    description: t.meta.description,
+    jobTitle: t.profile.role,
+    affiliation: {
+      '@type': 'CollegeOrUniversity',
+      name: 'Necmettin Erbakan Üniversitesi',
+    },
+    sameAs,
+    ...(email ? { email } : {}),
+    knowsAbout,
+  },
+};
 ---
+
 
 <!doctype html>
 <html lang={locale}>
@@ -54,6 +96,8 @@ const ogImage = new URL('/media/og.jpg', site);
         poster image for the opening bandwidth. */}
     <Font cssVariable="--font-sans" preload />
     <Font cssVariable="--font-serif" />
+
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />
   </head>
 
   <body>

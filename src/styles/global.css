@@ -105,45 +105,118 @@ html {
   }
 }
 
-/* The light sections — Arrival, Work, Lab, Context — share a physical ground
-   rather than flat white: a subliminal halftone dot field derived from the
-   brand mark, with soft washes of the film's gold light bleeding from the
-   edges like sunlight across paper. */
+/* The light sections — Arrival, Work, Lab, Context — share a tactile ground
+   rather than flat white: a visible yet refined halftone dot field derived from the
+   brand mark, with directional washes of the film's gold light shifting naturally
+   across sections like sunlight moving across paper. */
 :is(#arrival, #things-i-chased, #the-lab, #context) {
   background-color: var(--color-light);
+}
+
+#arrival {
   background-image:
-    /* Wash 1: soft doorway light bleeding from the upper-left edge */
+    /* Primary wash: doorway light entering from top-left */
     radial-gradient(
-      ellipse 70% 55% at 0% 25%,
-      color-mix(in srgb, var(--color-gold) 6%, transparent) 0%,
-      color-mix(in srgb, var(--color-threshold) 3%, transparent) 40%,
+      ellipse 80% 65% at 0% 0%,
+      color-mix(in srgb, var(--color-gold) 12%, transparent) 0%,
+      color-mix(in srgb, var(--color-threshold) 7%, transparent) 40%,
       transparent 75%
     ),
-    /* Wash 2: gentle ambient light bleeding from the lower-right edge */
+    /* Secondary wash: soft warmth on mid-right */
     radial-gradient(
-      ellipse 65% 50% at 100% 75%,
-      color-mix(in srgb, var(--color-gold) 4.5%, transparent) 0%,
-      color-mix(in srgb, var(--color-threshold) 3%, transparent) 35%,
+      ellipse 55% 45% at 100% 60%,
+      color-mix(in srgb, var(--color-gold) 7%, transparent) 0%,
+      color-mix(in srgb, var(--color-threshold) 4%, transparent) 35%,
       transparent 70%
     ),
-    /* Halftone field: repeating dots at sub-pixel scale, feathered to prevent
-       aliasing, moiré, or shimmer under smooth scroll */
+    /* Halftone field: 24px cell, 10% ink, sub-pixel antialiased */
     radial-gradient(
       circle at 1px 1px,
-      color-mix(in srgb, var(--color-ink) 5.5%, transparent) 0.75px,
-      transparent 1.25px
+      color-mix(in srgb, var(--color-ink) 10%, transparent) 0.85px,
+      transparent 1.4px
     );
-  background-size:
-    100% 100%,
-    100% 100%,
-    20px 20px;
-  background-position:
-    0 0,
-    0 0,
-    0 0;
-  background-repeat:
-    no-repeat,
-    no-repeat,
-    repeat;
+  background-size: 100% 100%, 100% 100%, 24px 24px;
+  background-position: 0 0, 0 0, 0 0;
+  background-repeat: no-repeat, no-repeat, repeat;
 }
+
+#things-i-chased {
+  background-image:
+    /* Primary wash: light shifts to right edge */
+    radial-gradient(
+      ellipse 70% 50% at 100% 30%,
+      color-mix(in srgb, var(--color-gold) 12%, transparent) 0%,
+      color-mix(in srgb, var(--color-threshold) 6%, transparent) 40%,
+      transparent 75%
+    ),
+    /* Secondary wash: lower-left accent */
+    radial-gradient(
+      ellipse 65% 45% at 0% 75%,
+      color-mix(in srgb, var(--color-gold) 8%, transparent) 0%,
+      color-mix(in srgb, var(--color-threshold) 4%, transparent) 35%,
+      transparent 70%
+    ),
+    /* Halftone field */
+    radial-gradient(
+      circle at 1px 1px,
+      color-mix(in srgb, var(--color-ink) 10%, transparent) 0.85px,
+      transparent 1.4px
+    );
+  background-size: 100% 100%, 100% 100%, 24px 24px;
+  background-position: 0 0, 0 0, 0 0;
+  background-repeat: no-repeat, no-repeat, repeat;
+}
+
+#the-lab {
+  background-image:
+    /* Primary wash: light shifts to left edge */
+    radial-gradient(
+      ellipse 70% 55% at 0% 45%,
+      color-mix(in srgb, var(--color-gold) 11%, transparent) 0%,
+      color-mix(in srgb, var(--color-threshold) 6%, transparent) 40%,
+      transparent 75%
+    ),
+    /* Secondary wash: subtle top-right counterweight */
+    radial-gradient(
+      ellipse 55% 40% at 100% 15%,
+      color-mix(in srgb, var(--color-gold) 6%, transparent) 0%,
+      transparent 65%
+    ),
+    /* Halftone field */
+    radial-gradient(
+      circle at 1px 1px,
+      color-mix(in srgb, var(--color-ink) 10%, transparent) 0.85px,
+      transparent 1.4px
+    );
+  background-size: 100% 100%, 100% 100%, 24px 24px;
+  background-position: 0 0, 0 0, 0 0;
+  background-repeat: no-repeat, no-repeat, repeat;
+}
+
+#context {
+  background-image:
+    /* Primary wash: upper-right edge */
+    radial-gradient(
+      ellipse 70% 55% at 100% 25%,
+      color-mix(in srgb, var(--color-gold) 11%, transparent) 0%,
+      color-mix(in srgb, var(--color-threshold) 6%, transparent) 40%,
+      transparent 75%
+    ),
+    /* Secondary wash: lower-left accent */
+    radial-gradient(
+      ellipse 60% 45% at 0% 70%,
+      color-mix(in srgb, var(--color-gold) 7%, transparent) 0%,
+      transparent 65%
+    ),
+    /* Halftone field */
+    radial-gradient(
+      circle at 1px 1px,
+      color-mix(in srgb, var(--color-ink) 10%, transparent) 0.85px,
+      transparent 1.4px
+    );
+  background-size: 100% 100%, 100% 100%, 24px 24px;
+  background-position: 0 0, 0 0, 0 0;
+  background-repeat: no-repeat, no-repeat, repeat;
+}
+
 

@@ -1,4 +1,23 @@
+# See https://zekierman.me/llms.txt for machine-readable context and AI summary
+
 User-agent: *
 Allow: /
 
+# Explicit permission for AI search and summary crawlers
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
 Sitemap: https://zekierman.me/sitemap-index.xml
+

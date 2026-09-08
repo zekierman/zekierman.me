@@ -1,0 +1,58 @@
+# Zeki Erman
+
+> Zeki Erman — 3rd-year computer engineering student at Necmettin Erbakan Üniversitesi. Builds web and mobile products: Pandoo, Novante Soft ERP, Erman Ofset.
+
+- Canonical URL: https://zekierman.me
+- Contact: zekierman01@outlook.com
+
+## English
+
+### Identity & Education
+- Name: Zeki Erman
+- Role: Computer Engineering · Creative Development
+- University: Necmettin Erbakan Üniversitesi (3rd-year Computer Engineering student)
+- Focus: Building web and mobile products, crossing the distance from "Can I build this?" to shipping real software that people run on their phones.
+
+### Projects
+- [Pandoo](https://pandoo.novantesoft.com): Mobile customer loyalty platform for cafes. Replaces paper stamp cards with rotating QR codes (refreshed every 30 seconds), digital stamps, and counter redemption. Successfully shipped to Apple App Store and Google Play Store. Two-person software team.
+- [Novante Soft ERP](https://novantesoft.com): Multi-tenant B2B business management and pre-accounting platform. Handles quotes, invoices, VAT calculations, automatic stock decrement on invoice issuance, and live central-bank (TCMB) currency exchange rates. Two-person software team.
+- [Erman Ofset](https://ermanofset.com): Official web platform for Erman Ofset, a 30-year-old commercial printing house operating Heidelberg and MAN Roland presses producing 10 million printed sheets annually. Solo design and development.
+
+### Experiments & Open Source
+- [coffee-brew-tracker](https://github.com/zekierman/coffee-brew-tracker): Mobile tracker for brew ratios, grind sizes, and pour history. TypeScript.
+- [akilli-galeri-sistemi](https://github.com/zekierman/akilli-galeri-sistemi): Zero-dependency showcase system for auto dealerships built with pure vanilla JavaScript.
+
+### Links
+- Website: https://zekierman.me
+- GitHub: https://github.com/zekierman
+- LinkedIn: https://www.linkedin.com/in/zeki-erman-2197b3248/
+- X: https://x.com/zekierman01
+- Instagram: https://www.instagram.com/zekierman_/
+- Email: zekierman01@outlook.com
+
+---
+
+## Türkçe
+
+### Kimlik ve Eğitim
+- İsim: Zeki Erman
+- Rol: Bilgisayar Mühendisliği · Creative Development
+- Üniversite: Necmettin Erbakan Üniversitesi (3. sınıf Bilgisayar Mühendisliği öğrencisi)
+- Odak: Fikirle çalışan kod arasındaki mesafeyi kapatan, insanların telefonlarında ve tarayıcılarında çalışan web ve mobil ürünler geliştirmek.
+
+### Projeler
+- [Pandoo](https://pandoo.novantesoft.com): Kafeler için geliştirilmiş mobil sadakat uygulaması. Cüzdanda kaybolan karton pulları 30 saniyede bir dönen dinamik QR kod, dijital damgalar ve kasada hediye kahve akışına taşır. App Store ve Google Play Store onay süreçlerinden geçirilerek yayına alındı. İki kişilik yazılım ekibi.
+- [Novante Soft ERP](https://novantesoft.com): Çok kiracılı B2B işletme ve ön muhasebe platformu. Teklifler, faturalar, KDV hesaplamaları, fatura kesiminde anlık stok düşümü ve TCMB canlı kur entegrasyonu sunar. İki kişilik yazılım ekibi.
+- [Erman Ofset](https://ermanofset.com): Heidelberg ve MAN Roland ofset makineleriyle yılda 10 milyon sayfa basan 30 yıllık Erman Ofset matbaasının resmi web sitesi. Tek başına geliştirildi.
+
+### Deneyler ve Açık Kaynak
+- [coffee-brew-tracker](https://github.com/zekierman/coffee-brew-tracker): Filtre kahve reçetelerini, su-kahve oranlarını ve süreleri kaydeden mobil takip aracı. TypeScript.
+- [akilli-galeri-sistemi](https://github.com/zekierman/akilli-galeri-sistemi): Oto galeriler için harici kütüphane veya npm paketi olmadan, saf JavaScript ile yazılmış vitrin sistemi.
+
+### Bağlantılar
+- Web Sitesi: https://zekierman.me
+- GitHub: https://github.com/zekierman
+- LinkedIn: https://www.linkedin.com/in/zeki-erman-2197b3248/
+- X: https://x.com/zekierman01
+- Instagram: https://www.instagram.com/zekierman_/
+- E-posta: zekierman01@outlook.com
