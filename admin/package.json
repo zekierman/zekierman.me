@@ -6,7 +6,8 @@
   "description": "The panel that adds a project to zekierman.me. Runs on the VPS beside the site; writes content files, not a database.",
   "scripts": {
     "start": "node server.mjs",
-    "set-password": "node set-password.mjs"
+    "set-password": "node set-password.mjs",
+    "check-password": "node set-password.mjs --check"
   },
   "dependencies": {
     "@fastify/cookie": "^11.0.2",
