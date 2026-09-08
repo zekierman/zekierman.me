@@ -73,6 +73,16 @@ const t = getCopy(locale).arrival;
     text-transform: uppercase;
   }
 
+  /* A short gold rule above the name, echoing the one under the hero title. */
+  .who::before {
+    content: '';
+    display: block;
+    width: clamp(2.2rem, 5vw, 4.5rem);
+    height: 1px;
+    margin-bottom: 1.6rem;
+    background: var(--color-gold);
+  }
+
   .role {
     margin: 0.6rem 0 0;
     font-size: 0.75rem;

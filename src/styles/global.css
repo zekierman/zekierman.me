@@ -1,19 +1,33 @@
 @import 'tailwindcss';
 
+/* Every colour here is sampled from the film itself — see STYLE.md for the
+   frame and region each one came from. The point is that the page and the
+   footage never disagree about what light looks like in this world. */
 @theme {
-  /* Two worlds. The site travels from the first to the second. */
-  --color-dark: #05060a;
-  --color-dark-soft: #0d0f16;
+  /* The dark world. Warm, not blue: the film's black has more red than blue,
+     and a neutral blue-black put the page and the footage in different rooms. */
+  --color-void: #0f0a06;
+  --color-void-lift: #171505;
+
+  /* The colour the doorway light makes when it lands on something.
+     The only accent, and it never becomes a button fill or a gradient. */
+  --color-gold: #9e7e27;
+  --color-gold-deep: #6e5518;
+  --color-gold-lift: #c9a44b;
+
+  /* The threshold and the light world beyond it. */
+  --color-threshold: #feeec3;
+  --color-light: #faf3e3;
+  --color-light-edge: #f4f2e9;
+
+  /* Text on light. Warm black, never neutral. */
   --color-ink: #14110d;
   --color-ink-soft: #4a453d;
 
-  /* The light world's palette, sampled from the frame the door opens onto. */
-  --color-light: #f6f1e8;
-  --color-light-warm: #fdf7ec;
-  --color-light-edge: #e6ded0;
-
   --font-display: var(--font-serif);
   --font-body: var(--font-sans);
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 :root {
@@ -28,22 +42,25 @@ html {
 
 body {
   margin: 0;
-  background: var(--color-dark);
+  background: var(--color-void);
   color: var(--color-light);
   font-family: var(--font-body);
   font-weight: 300;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-}
-
-/* The hero is the only thing that should ever move the page horizontally: never. */
-body {
+  /* The hero bleeds its images past the gutter; nothing may scroll sideways. */
   overflow-x: clip;
 }
 
 ::selection {
-  background: var(--color-light);
-  color: var(--color-dark);
+  background: var(--color-gold);
+  color: var(--color-void);
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 1px solid var(--color-gold-lift);
+  outline-offset: 4px;
 }
 
 @media (prefers-reduced-motion: reduce) {

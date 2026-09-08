@@ -1,0 +1,226 @@
+---
+import { getCopy, type Locale } from '../content/copy';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = getCopy(locale).work;
+---
+
+<section class="work" id="things-i-chased">
+  <header class="head">
+    <p class="label">{t.label}</p>
+    <p class="lead">{t.lead.map((line) => <span>{line}</span>)}</p>
+  </header>
+
+  {
+    t.projects.map((p, i) => (
+      <article class="project" data-reveal data-side={i % 2 === 0 ? 'right' : 'left'}>
+        <div class="text">
+          <p class="index" aria-hidden="true">
+            {p.index}
+          </p>
+          <h3 class="name">
+            <a href={p.href} target="_blank" rel="noopener noreferrer">
+              {p.name}
+            </a>
+          </h3>
+          <p class="meta">{p.meta}</p>
+          <p class="question">{p.question}</p>
+          <p class="note">{p.note}</p>
+        </div>
+
+        <figure class="shot">
+          <img src={p.image} alt={p.name} loading="lazy" decoding="async" width="1400" height="664" />
+        </figure>
+      </article>
+    ))
+  }
+</section>
+
+<style>
+  .work {
+    background: var(--color-light);
+    color: var(--color-ink);
+    padding: 0 0 28svh;
+    overflow-x: clip;
+  }
+
+  .head {
+    padding: 0 6vw 14svh;
+  }
+
+  .label {
+    margin: 0 0 2.4rem;
+    font-size: 0.625rem;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    color: var(--color-gold-deep);
+  }
+
+  .lead {
+    margin: 0;
+    max-width: 24ch;
+    font-family: var(--font-display);
+    font-size: clamp(1.7rem, 4.4vw, 3.4rem);
+    line-height: 1.15;
+    letter-spacing: -0.012em;
+  }
+
+  .lead span {
+    display: block;
+  }
+
+  .project {
+    display: grid;
+    gap: clamp(2.5rem, 5vw, 4.5rem);
+    align-items: center;
+    padding: 0 0 18svh;
+  }
+
+  .text {
+    padding: 0 6vw;
+    max-width: 62ch;
+  }
+
+  /* Gold marks the things the doorway light lands on. Here: the numbering. */
+  .index {
+    margin: 0 0 1.4rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    color: var(--color-gold-deep);
+  }
+
+  .name {
+    margin: 0;
+    font-size: clamp(2.1rem, 6.4vw, 4.6rem);
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+
+  .name a {
+    color: inherit;
+    text-decoration: none;
+    /* The underline is drawn, not borrowed, so it can sit off the baseline and
+       animate without shifting the line box. */
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-position: 0 96%;
+    background-repeat: no-repeat;
+    transition: background-size 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .name a:hover,
+  .name a:focus-visible {
+    background-size: 100% 1px;
+  }
+
+  .meta {
+    margin: 1.5rem 0 0;
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-ink-soft);
+  }
+
+  .question {
+    margin: 3.4rem 0 0;
+    max-width: 20ch;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: clamp(1.35rem, 3.1vw, 2.3rem);
+    line-height: 1.25;
+  }
+
+  .note {
+    margin: 2rem 0 0;
+    max-width: 44ch;
+    font-size: clamp(0.95rem, 1.25vw, 1.05rem);
+    line-height: 1.65;
+    color: var(--color-ink-soft);
+  }
+
+  /* The image bleeds off one edge, alternating down the page. A grid of equal
+     cards would turn three different kinds of work into one shape. */
+  .shot {
+    margin: 0;
+    overflow: hidden;
+  }
+
+  .shot img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  @media (min-width: 60rem) {
+    .project {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    }
+
+    .project[data-side='right'] .text {
+      grid-column: 1;
+      padding-left: 6vw;
+      padding-right: 0;
+    }
+    .project[data-side='right'] .shot {
+      grid-column: 2;
+      margin-right: calc(-1 * var(--bleed, 4vw));
+      border-radius: 2px 0 0 2px;
+    }
+
+    .project[data-side='left'] .text {
+      grid-column: 2;
+      padding-right: 6vw;
+      padding-left: 0;
+    }
+    .project[data-side='left'] .shot {
+      grid-column: 1;
+      grid-row: 1;
+      margin-left: calc(-1 * var(--bleed, 4vw));
+      border-radius: 0 2px 2px 0;
+    }
+  }
+
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity 1s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  [data-reveal].is-in {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-reveal] {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  const items = document.querySelectorAll<HTMLElement>('[data-reveal]');
+  if (items.length && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          entry.target.classList.add('is-in');
+          io.unobserve(entry.target); // reveal once; re-animating on the way back up reads as a glitch
+        }
+      },
+      { rootMargin: '0px 0px -12% 0px' },
+    );
+    items.forEach((el) => io.observe(el));
+  } else {
+    items.forEach((el) => el.classList.add('is-in'));
+  }
+</script>

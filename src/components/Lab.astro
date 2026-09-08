@@ -1,0 +1,149 @@
+---
+import { getCopy, type Locale } from '../content/copy';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = getCopy(locale).lab;
+---
+
+<section class="lab" id="the-lab">
+  <header class="head" data-reveal>
+    <p class="label">{t.label}</p>
+    <p class="lead">{t.lead.map((line) => <span>{line}</span>)}</p>
+  </header>
+
+  <ul class="list">
+    {
+      t.items.map((item) => (
+        <li class="item" data-reveal>
+          <div class="name">
+            {item.href ? (
+              <a href={item.href} target="_blank" rel="noopener noreferrer">
+                {item.name}
+                <span class="arrow" aria-hidden="true">
+                  ↗
+                </span>
+              </a>
+            ) : (
+              <span>{item.name}</span>
+            )}
+          </div>
+          <p class="meta">{item.meta}</p>
+          <p class="note">{item.note}</p>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<style>
+  /* No images here on purpose. The lab is the part that has not been packaged,
+     so it is presented the way it exists: as a list of things, plainly. */
+  .lab {
+    background: var(--color-light);
+    color: var(--color-ink);
+    padding: 0 6vw 26svh;
+  }
+
+  .head {
+    padding-bottom: 12svh;
+  }
+
+  .label {
+    margin: 0 0 2.4rem;
+    font-size: 0.625rem;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    color: var(--color-gold-deep);
+  }
+
+  .lead {
+    margin: 0;
+    max-width: 26ch;
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 4vw, 3rem);
+    line-height: 1.15;
+    letter-spacing: -0.012em;
+  }
+
+  .lead span {
+    display: block;
+  }
+
+  .list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid color-mix(in srgb, var(--color-ink) 14%, transparent);
+  }
+
+  .item {
+    padding: clamp(2rem, 4vw, 3.2rem) 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 14%, transparent);
+  }
+
+  @media (min-width: 60rem) {
+    .item {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+      column-gap: 5vw;
+      align-items: start;
+    }
+    .note {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+      margin-top: 0;
+    }
+  }
+
+  .name {
+    font-size: clamp(1.15rem, 2.4vw, 1.75rem);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  .name a {
+    color: inherit;
+    text-decoration: none;
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size 0.5s var(--ease-out);
+  }
+
+  .name a:hover,
+  .name a:focus-visible {
+    background-size: 100% 1px;
+  }
+
+  .arrow {
+    display: inline-block;
+    margin-left: 0.4em;
+    font-size: 0.7em;
+    color: var(--color-gold-deep);
+    transition: transform 0.4s var(--ease-out);
+  }
+
+  .name a:hover .arrow {
+    transform: translate(2px, -2px);
+  }
+
+  .meta {
+    margin: 0.9rem 0 0;
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-ink-soft);
+  }
+
+  .note {
+    margin: 1.4rem 0 0;
+    max-width: 46ch;
+    font-size: clamp(0.95rem, 1.25vw, 1.05rem);
+    line-height: 1.65;
+    color: var(--color-ink-soft);
+  }
+</style>

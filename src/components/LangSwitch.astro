@@ -21,9 +21,10 @@ const other: Locale = locale === 'en' ? 'tr' : 'en';
     right: max(1.6rem, env(safe-area-inset-right));
     z-index: 40;
     display: flex;
-    gap: 0.5em;
-    font-size: 0.625rem;
-    letter-spacing: 0.24em;
+    gap: 0.45em;
+    align-items: center;
+    font-size: clamp(0.75rem, 0.95vw, 0.875rem);
+    letter-spacing: 0.22em;
     /* Sits over both worlds, so it uses the light ink and blends instead of
        flipping colour mid-scroll. */
     color: var(--color-light);
@@ -33,7 +34,9 @@ const other: Locale = locale === 'en' ? 'tr' : 'en';
   .lang a {
     color: inherit;
     text-decoration: none;
-    opacity: 0.55;
+    /* A language switch is a real target, not decoration: give it room to be hit. */
+    padding: 0.35rem 0.15rem;
+    opacity: 0.6;
     transition: opacity 0.3s ease;
   }
 
