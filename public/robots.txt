@@ -1,4 +1,6 @@
-# See https://zekierman.me/llms.txt for machine-readable context and AI summary
+# Machine-readable context:
+#   https://zekierman.me/llms.txt       summary — who, what, where
+#   https://zekierman.me/llms-full.txt  detail — how the work is built
 
 User-agent: *
 Allow: /
