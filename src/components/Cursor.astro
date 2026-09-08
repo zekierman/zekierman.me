@@ -1,0 +1,200 @@
+---
+// A cursor for this site.
+//
+// A seagull was the obvious idea and it is the wrong one: at sixteen pixels the
+// halftone mark is an unreadable smudge, and putting the brand on the pointer
+// cheapens it. What the pointer can usefully carry is a word — the same word the
+// Lab writes on everything else it labels. So it is a small ring that names what
+// is under it: VIEW over a project, EXP over an experiment, OPEN over a link
+// that leaves.
+//
+// It is a progressive enhancement and nothing depends on it. The native cursor
+// is only hidden once this one is actually running, so a failure anywhere above
+// leaves a working pointer rather than an invisible one.
+---
+
+<div class="cursor" data-cursor-root aria-hidden="true">
+  <span class="ring" data-cursor-ring></span>
+  <span class="label" data-cursor-label></span>
+</div>
+
+<style>
+  .cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 90;
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    /* Never in the way of what it is pointing at. */
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.25s var(--ease-out);
+    /* Off until the script decides this pointer deserves it. */
+    visibility: hidden;
+  }
+
+  :global(html[data-cursor='on']) .cursor {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  /* Only where the ring is genuinely drawn, and only on a fine pointer. Hiding
+     the system cursor is not free — some people have chosen a large or
+     high-contrast one deliberately — so it is hidden as narrowly as possible. */
+  :global(html[data-cursor='on']),
+  :global(html[data-cursor='on'] a),
+  :global(html[data-cursor='on'] button) {
+    cursor: none;
+  }
+
+  .ring {
+    display: block;
+    width: 9px;
+    height: 9px;
+    margin: -4.5px 0 0 -4.5px;
+    border-radius: 50%;
+    border: 1px solid currentColor;
+    transition:
+      width 0.3s var(--ease-out),
+      height 0.3s var(--ease-out),
+      margin 0.3s var(--ease-out),
+      background-color 0.3s var(--ease-out);
+  }
+
+  /* Over something that can be opened, the ring fills: the pointer stops being
+     a position and becomes a target. */
+  .cursor[data-active] .ring {
+    width: 5px;
+    height: 5px;
+    margin: -2.5px 0 0 -2.5px;
+    background: currentColor;
+  }
+
+  .label {
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateX(-0.25rem);
+    transition:
+      opacity 0.25s var(--ease-out),
+      transform 0.25s var(--ease-out);
+  }
+
+  .cursor[data-active] .label {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* The page is two worlds and the pointer crosses both. `difference` is what the
+     index and the language switch already use to stay legible over either. */
+  .cursor {
+    color: var(--color-light);
+    mix-blend-mode: difference;
+  }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-cursor-root]');
+  const label = document.querySelector<HTMLElement>('[data-cursor-label]');
+
+  // A ring that trails a finger is nonsense, and a pointer is not something to
+  // animate at someone who asked for less motion. Both cases keep the real one.
+  const fine = matchMedia('(hover: hover) and (pointer: fine)');
+  const calm = matchMedia('(prefers-reduced-motion: reduce)');
+  // Someone running a forced-colours mode has told the system how a pointer
+  // should look. That is not ours to override.
+  const forced = matchMedia('(forced-colors: active)');
+
+  if (root && label && fine.matches && !calm.matches && !forced.matches) {
+    let targetX = 0;
+    let targetY = 0;
+    let x = 0;
+    let y = 0;
+    let running = false;
+    let placed = false;
+
+    /** What the thing under the pointer calls itself, or null if it is just page. */
+    function labelFor(element: Element | null): string | null {
+      const hit = element?.closest('a, button, [data-row], summary');
+      if (!hit) return null;
+
+      const declared = hit.getAttribute('data-cursor');
+      if (declared) return declared;
+
+      if (hit.closest('[data-showcase]')) return 'VIEW';
+      if (hit.closest('#the-lab')) return 'EXP';
+
+      const href = hit.getAttribute('href') ?? '';
+      if (href.startsWith('mailto:')) return 'MAIL';
+      if (hit.getAttribute('target') === '_blank') return 'OPEN';
+      return null;
+    }
+
+    // Eased, so the ring reads as something following rather than something
+    // welded to the pointer — which is also what makes the label legible while
+    // the hand is still moving.
+    const tick = () => {
+      x += (targetX - x) * 0.22;
+      y += (targetY - y) * 0.22;
+      root.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+
+      if (Math.abs(targetX - x) < 0.05 && Math.abs(targetY - y) < 0.05) {
+        running = false;
+        return;
+      }
+      requestAnimationFrame(tick);
+    };
+
+    const start = () => {
+      if (running) return;
+      running = true;
+      requestAnimationFrame(tick);
+    };
+
+    document.addEventListener(
+      'pointermove',
+      (event) => {
+        // A pen or a finger reaching a device that also has a mouse: leave the
+        // ring where it is and let the real pointer take over.
+        if (event.pointerType !== 'mouse') return;
+
+        targetX = event.clientX;
+        targetY = event.clientY;
+
+        if (!placed) {
+          placed = true;
+          x = targetX;
+          y = targetY;
+          document.documentElement.dataset.cursor = 'on';
+        }
+        start();
+
+        const name = labelFor(event.target as Element);
+        if (name) {
+          root.dataset.active = '';
+          if (label.textContent !== name) label.textContent = name;
+        } else {
+          delete root.dataset.active;
+        }
+      },
+      { passive: true },
+    );
+
+    // Off the window, out of the document, or into another tab: the ring should
+    // not be left sitting somewhere the pointer is not.
+    const hide = () => {
+      delete document.documentElement.dataset.cursor;
+      placed = false;
+    };
+    document.addEventListener('pointerleave', hide);
+    window.addEventListener('blur', hide);
+    document.addEventListener('pointerdown', (event) => {
+      if (event.pointerType !== 'mouse') hide();
+    });
+  }
+</script>
