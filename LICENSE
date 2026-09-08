@@ -1,0 +1,46 @@
+Copyright (c) 2026 Zeki Erman. All rights reserved.
+
+This repository is published to be read, not to be reused.
+
+WHAT YOU MAY DO
+
+You may read this repository, clone it, and run it locally. You may learn from
+it, quote short passages of the source with attribution, and borrow a technique
+the way you would borrow one from a blog post — the scroll-scrubbed film, the
+halftone threshold, the way the panel writes content files instead of rows in a
+database. Ideas are not property. Take them.
+
+WHAT YOU MAY NOT DO
+
+You may not redistribute this work, in whole or in substantial part, whether
+modified or not. You may not deploy it, publicly or privately, as your own site
+or as the basis of one. You may not sell it, sublicense it, or include it in a
+template, theme, starter kit or course.
+
+The following are not covered by any permission above and remain fully reserved:
+
+  - "Chasing Light", the film in assets/ and public/media/, and every frame,
+    poster and derivative made from it
+  - the seagull mark, the wordmark, and everything in assets/brand-kit/
+  - every word of the copy, in both languages, in src/content/
+  - the screenshots of Pandoo, Novante Soft ERP and Erman Ofset, which show
+    other people's work and are not mine to license to you either
+
+NO WARRANTY
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHOR BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+THIRD-PARTY WORK
+
+The dependencies in package.json keep their own licences. The fonts (Archivo,
+Instrument Serif) are OFL. The icons are drawn from bootstrap-icons (MIT) and
+simple-icons (CC0); the brand marks they contain belong to their owners and are
+used here to name a tool, not to imply any endorsement.
+
+If you want to use something here that this licence does not allow, ask:
+zekierman01@outlook.com

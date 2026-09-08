@@ -78,3 +78,9 @@ instead of the entire film.
 
 Not wired up yet. Target is a static build behind a CDN, with the hero film
 served from an origin that honours HTTP range requests — scrubbing depends on it.
+
+## Licence
+
+Published to be read, not reused. All rights reserved — see [LICENSE](LICENSE).
+Borrow the techniques; do not redeploy the site. The film, the mark and the copy
+are not licensed at all.

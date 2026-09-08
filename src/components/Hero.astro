@@ -8,7 +8,10 @@ const { locale } = Astro.props;
 const t = getCopy(locale).hero;
 ---
 
-<section class="hero" id="the-door" data-hero>
+{/* Three people were shown this and none of them scrolled. The film cannot start
+    until they do, so the invitation has to be unmissable: a line of type, a bead
+    falling down a rail, and the pointer itself carrying the word. */}
+<section class="hero" id="the-door" data-hero data-cursor={t.scrollLabel} data-cursor-hint>
   <div class="stage">
     <video
       class="film"
@@ -57,7 +60,12 @@ const t = getCopy(locale).hero;
       {t.beats.map((b) => <p class="beat" data-beat data-at={b.at}>{b.text}</p>)}
     </div>
 
-    <p class="hint" data-hero-hint>{t.hint}</p>
+    <div class="hint" data-hero-hint>
+      <span class="hint-text">{t.hint}</span>
+      <span class="hint-rail" aria-hidden="true">
+        <span class="hint-bead"></span>
+      </span>
+    </div>
   </div>
 </section>
 
@@ -244,6 +252,10 @@ const t = getCopy(locale).hero;
     right: 0;
     bottom: max(2.2rem, env(safe-area-inset-bottom));
     margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.85rem;
     text-align: center;
     font-size: clamp(0.72rem, 0.95vw, 0.85rem);
     letter-spacing: 0.28em;
@@ -252,6 +264,51 @@ const t = getCopy(locale).hero;
     opacity: 0.8;
     text-shadow: 0 1px 3px rgb(0 0 0 / 0.7);
     pointer-events: none;
+  }
+
+  /* The rail the bead falls down. It is a hairline, like every other mark on this
+     site, and it points the one direction that makes anything happen. */
+  .hint-rail {
+    position: relative;
+    display: block;
+    width: 1px;
+    height: 2.6rem;
+    overflow: hidden;
+    background: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--color-light) 42%, transparent),
+      transparent
+    );
+  }
+
+  /* This is the one thing on the page that moves without being scrolled, and it
+     earns it: it is not decoration, it is the instruction. */
+  .hint-bead {
+    position: absolute;
+    left: -1.5px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--color-light);
+    box-shadow: 0 0 6px rgb(0 0 0 / 0.5);
+    animation: hint-fall 2.4s var(--ease-out) infinite;
+  }
+
+  @keyframes hint-fall {
+    0% {
+      top: -4px;
+      opacity: 0;
+    }
+    16% {
+      opacity: 1;
+    }
+    68% {
+      opacity: 1;
+    }
+    100% {
+      top: 2.6rem;
+      opacity: 0;
+    }
   }
 
   /* Without motion there is no journey to scrub: hold the opening composition. */
@@ -263,6 +320,11 @@ const t = getCopy(locale).hero;
     .hold,
     .beats {
       display: none;
+    }
+    /* The bead stops, but the rail stays: the direction is still worth showing. */
+    .hint-bead {
+      animation: none;
+      top: 40%;
     }
   }
 </style>
@@ -349,7 +411,7 @@ const t = getCopy(locale).hero;
       title!.style.opacity = String(1 - out);
       title!.style.transform = `translateY(${-out * 30}px)`;
       scrim!.style.opacity = String(1 - out);
-      hint!.style.opacity = String(Math.max(0, 0.8 * (1 - p / 0.09)));
+      hint!.style.opacity = String(Math.max(0, 0.85 * (1 - p / 0.14)));
 
       let strongest = 0;
       for (const b of beats) {

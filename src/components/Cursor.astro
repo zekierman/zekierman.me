@@ -49,27 +49,54 @@
     cursor: none;
   }
 
+  /* A registration mark, not a dot.
+     It is what a press uses to line one colour up with the next — the mark that
+     says "this is exactly here". It belongs to the same world as the halftone
+     the brand is built from, it is thinner than a ring, and unlike a circle it
+     actually points at something. */
   .ring {
     display: block;
-    width: 9px;
-    height: 9px;
-    margin: -4.5px 0 0 -4.5px;
-    border-radius: 50%;
-    border: 1px solid currentColor;
-    transition:
-      width 0.3s var(--ease-out),
-      height 0.3s var(--ease-out),
-      margin 0.3s var(--ease-out),
-      background-color 0.3s var(--ease-out);
+    position: relative;
+    width: 15px;
+    height: 15px;
+    margin: -7.5px 0 0 -7.5px;
+    transition: transform 0.35s var(--ease-out);
   }
 
-  /* Over something that can be opened, the ring fills: the pointer stops being
-     a position and becomes a target. */
-  .cursor[data-active] .ring {
-    width: 5px;
-    height: 5px;
-    margin: -2.5px 0 0 -2.5px;
+  .ring::before,
+  .ring::after {
+    content: '';
+    position: absolute;
     background: currentColor;
+    transition:
+      inset 0.35s var(--ease-out),
+      opacity 0.3s var(--ease-out);
+  }
+
+  /* Two hairlines crossing, with the centre left open so the mark sits over what
+     it is pointing at rather than covering it. */
+  .ring::before {
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 1px;
+    margin-top: -0.5px;
+    clip-path: polygon(0 0, 38% 0, 38% 100%, 0 100%, 100% 100%, 62% 100%, 62% 0, 100% 0);
+  }
+
+  .ring::after {
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 1px;
+    margin-left: -0.5px;
+    clip-path: polygon(0 0, 100% 0, 100% 38%, 0 38%, 0 100%, 100% 100%, 100% 62%, 0 62%);
+  }
+
+  /* Over a target the mark turns onto its diagonal and closes in: the same
+     gesture a press makes when it locks registration. */
+  .cursor[data-showing]:not([data-hint]) .ring {
+    transform: rotate(45deg) scale(0.72);
   }
 
   .label {
@@ -85,7 +112,7 @@
       transform 0.25s var(--ease-out);
   }
 
-  .cursor[data-active] .label {
+  .cursor[data-showing] .label {
     opacity: 1;
     transform: none;
   }
@@ -118,20 +145,32 @@
     let running = false;
     let placed = false;
 
-    /** What the thing under the pointer calls itself, or null if it is just page. */
-    function labelFor(element: Element | null): string | null {
+    /**
+     * What the thing under the pointer calls itself.
+     *
+     * `hint` is the difference between a word and a target: the hero says SCROLL,
+     * but it is not clickable, so the mark must not close in on it as though it
+     * were. Three people were shown the hero and none of them scrolled — the
+     * pointer carrying the word is one of the three places that now says so.
+     */
+    function labelFor(element: Element | null): { text: string; hint: boolean } | null {
+      const declared = element?.closest('[data-cursor]');
+      if (declared) {
+        return {
+          text: declared.getAttribute('data-cursor') ?? '',
+          hint: declared.hasAttribute('data-cursor-hint'),
+        };
+      }
+
       const hit = element?.closest('a, button, [data-row], summary');
       if (!hit) return null;
 
-      const declared = hit.getAttribute('data-cursor');
-      if (declared) return declared;
-
-      if (hit.closest('[data-showcase]')) return 'VIEW';
-      if (hit.closest('#the-lab')) return 'EXP';
+      if (hit.closest('[data-showcase]')) return { text: 'VIEW', hint: false };
+      if (hit.closest('#the-lab')) return { text: 'EXP', hint: false };
 
       const href = hit.getAttribute('href') ?? '';
-      if (href.startsWith('mailto:')) return 'MAIL';
-      if (hit.getAttribute('target') === '_blank') return 'OPEN';
+      if (href.startsWith('mailto:')) return { text: 'MAIL', hint: false };
+      if (hit.getAttribute('target') === '_blank') return { text: 'OPEN', hint: false };
       return null;
     }
 
@@ -174,12 +213,15 @@
         }
         start();
 
-        const name = labelFor(event.target as Element);
-        if (name) {
-          root.dataset.active = '';
-          if (label.textContent !== name) label.textContent = name;
+        const found = labelFor(event.target as Element);
+        if (found?.text) {
+          root.dataset.showing = '';
+          if (found.hint) root.dataset.hint = '';
+          else delete root.dataset.hint;
+          if (label.textContent !== found.text) label.textContent = found.text;
         } else {
-          delete root.dataset.active;
+          delete root.dataset.showing;
+          delete root.dataset.hint;
         }
       },
       { passive: true },
