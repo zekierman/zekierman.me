@@ -260,7 +260,15 @@
           say(e.message);
         }
       };
-      $('pw').onkeydown = (e) => e.key === 'Enter' && $('signin').click();
+      // addEventListener, not onkeydown, and no expression body.
+      // `onkeydown = (e) => e.key === 'Enter' && click()` returns false for every
+      // other key, and a false return from an inline handler property calls
+      // preventDefault — so this line silently cancelled every keystroke and the
+      // password field could not be typed into on any device. Enter worked,
+      // because .click() returns undefined.
+      $('pw').addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') $('signin').click();
+      });
 
       // ---- tezgâh envanteri ----
       let tools = [];
