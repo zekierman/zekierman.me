@@ -45,7 +45,11 @@ const t = getCopy(locale).hero;
         into "LİGHT". */}
     <div class="title" lang="en" data-hero-title>
       <span class="rule" aria-hidden="true"></span>
-      <h1>{t.title.map((line) => <span class="word">{line}</span>)}</h1>
+      {/* The trailing space is load-bearing: the words are block-level so it
+          collapses visually, but without it the heading's text content is
+          "ChasingLight" — one token to anything reading the markup rather than
+          rendering it. */}
+      <h1>{t.title.map((line) => <span class="word">{line}{' '}</span>)}</h1>
       {/* The brand lockup puts the name under the concept, not over it: the site
           is about the chase, and the person is the one doing it. */}
       <p class="who">Zeki Erman</p>
