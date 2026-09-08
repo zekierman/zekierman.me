@@ -30,6 +30,8 @@ const site = resolve(here, '..');
 const PROJECTS = join(site, 'src', 'content', 'projects');
 const SHOTS = join(site, 'public', 'media', 'work');
 const MANIFEST = join(site, 'src', 'content', 'work-shots.json');
+const TOOLKIT = join(site, 'src', 'content', 'toolkit.json');
+const SETTINGS = join(site, 'src', 'content', 'settings.json');
 const CREDENTIALS = join(here, '.credentials.json');
 
 const PORT = Number(process.env.PORT ?? 4322);
@@ -137,6 +139,44 @@ function validate(body) {
     out[locale] = filled;
   }
   return { errors, doc: out };
+}
+
+// ---------------------------------------------------------------------------
+// the bench inventory
+//
+// Written as one array rather than a file per tool: the list is short and is
+// reordered far more often than it is added to, so a single write beats
+// renumbering eleven documents. The panel sends the whole list back, which also
+// makes reordering nothing more than sending it in a different sequence.
+
+// A simple-icons slug. Empty is allowed and means "no mark exists for this" —
+// the page falls back to a monogram rather than breaking.
+const ICON = /^[a-z0-9.-]{0,40}$/;
+
+function validateToolkit(list) {
+  const errors = [];
+  if (!Array.isArray(list)) return { errors: ['toolkit: expected a list'], docs: [] };
+  if (list.length > 40) errors.push('toolkit: at most 40 tools');
+
+  const seen = new Set();
+  const docs = list.map((raw, i) => {
+    const id = typeof raw?.id === 'string' ? raw.id : '';
+    if (!slugOk(id)) errors.push(`#${i + 1}: id must be lowercase letters, digits and dashes`);
+    if (seen.has(id)) errors.push(`#${i + 1}: duplicate id "${id}"`);
+    seen.add(id);
+
+    const name = typeof raw?.name === 'string' ? raw.name.trim() : '';
+    if (!name) errors.push(`#${i + 1}: name is required`);
+    if (name.length > 40) errors.push(`#${i + 1}: name too long`);
+
+    const icon = typeof raw?.icon === 'string' ? raw.icon.trim().toLowerCase() : '';
+    if (!ICON.test(icon)) errors.push(`#${i + 1}: icon must be a simple-icons slug`);
+
+    // Order is the position it arrives in. Sending the list in a new sequence is
+    // how it is reordered; nobody should have to renumber by hand.
+    return { id, order: i + 1, name, icon };
+  });
+  return { errors, docs };
 }
 
 async function listProjects() {
@@ -268,6 +308,37 @@ app.post('/api/logout', async (_req, reply) => {
 app.get('/api/session', async (req) => ({ signedIn: sessionValid(req.cookies.session) }));
 
 app.get('/api/projects', async () => ({ projects: await listProjects() }));
+
+app.get('/api/toolkit', async () => {
+  if (!existsSync(TOOLKIT)) return { toolkit: [] };
+  return { toolkit: JSON.parse(await readFile(TOOLKIT, 'utf8')) };
+});
+
+app.put('/api/toolkit', async (req, reply) => {
+  const { errors, docs } = validateToolkit(req.body?.toolkit);
+  if (errors.length) return reply.code(400).send({ error: errors.join('; ') });
+  await writeFile(TOOLKIT, JSON.stringify(docs, null, 2) + '\n');
+  await publish('Update the bench inventory\n\nWritten from the panel.');
+  return { ok: true, count: docs.length };
+});
+
+app.get('/api/settings', async () => {
+  if (!existsSync(SETTINGS)) return { settings: { githubUsername: '' } };
+  return { settings: JSON.parse(await readFile(SETTINGS, 'utf8')) };
+});
+
+app.put('/api/settings', async (req, reply) => {
+  // Deliberately narrow. Secrets are not settings: the GitHub token lives in the
+  // server's environment and is never readable or writable from here, so a
+  // compromised panel session cannot walk away with it.
+  const name = typeof req.body?.githubUsername === 'string' ? req.body.githubUsername.trim() : '';
+  if (!/^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$/.test(name)) {
+    return reply.code(400).send({ error: 'that is not a GitHub username' });
+  }
+  await writeFile(SETTINGS, JSON.stringify({ githubUsername: name }, null, 2) + '\n');
+  await publish('Update site settings\n\nWritten from the panel.');
+  return { ok: true };
+});
 
 app.post('/api/projects', async (req, reply) => {
   let fields = {};

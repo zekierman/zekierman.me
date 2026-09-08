@@ -1,0 +1,13 @@
+[
+  { "id": "typescript", "order": 1, "name": "TypeScript", "icon": "typescript" },
+  { "id": "astro", "order": 2, "name": "Astro", "icon": "astro" },
+  { "id": "react", "order": 3, "name": "React / Next.js", "icon": "nextdotjs" },
+  { "id": "node", "order": 4, "name": "Node.js", "icon": "nodedotjs" },
+  { "id": "postgresql", "order": 5, "name": "PostgreSQL", "icon": "postgresql" },
+  { "id": "supabase", "order": 6, "name": "Supabase", "icon": "supabase" },
+  { "id": "docker", "order": 7, "name": "Docker", "icon": "docker" },
+  { "id": "git", "order": 8, "name": "Git", "icon": "git" },
+  { "id": "swift", "order": 9, "name": "Swift / iOS", "icon": "swift" },
+  { "id": "azure", "order": 10, "name": "Azure", "icon": "" },
+  { "id": "python", "order": 11, "name": "Python", "icon": "python" }
+]

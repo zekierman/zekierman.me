@@ -1,0 +1,213 @@
+---
+import { getCollection } from 'astro:content';
+import { monogram, techIcon } from '../icons';
+
+// The bench inventory is data, not markup: the panel writes src/content/toolkit.json
+// and this reads it. Ordered here rather than in the file so a hand-edited list with
+// gaps or duplicates still renders in a sane sequence.
+const entries = (await getCollection('toolkit')).sort((a, b) => a.data.order - b.data.order);
+
+const tools = await Promise.all(
+  entries.map(async (entry) => ({
+    name: entry.data.name,
+    // Resolved at build time. Null when the set has no mark for it — brand marks
+    // come and go as trademark policies change, and a tool without a logo still
+    // belongs on the bench.
+    path: await techIcon(entry.data.icon),
+    monogram: monogram(entry.data.name),
+  })),
+);
+---
+
+<section class="toolkit" data-reveal>
+  <div class="toolkit-head">
+    <span>CURRENT TOOLKIT // 2026</span>
+    <span>SYS.TOOLS</span>
+  </div>
+
+  <div class="tools">
+    {
+      tools.map((tool, index) => (
+        <div class="tool">
+          <span class="number">
+            {String(index + 1).padStart(2, '0')}
+          </span>
+
+          <span class="tool-name">{tool.name}</span>
+
+          <span class="mark" aria-hidden="true">
+            {tool.path ? (
+              <svg viewBox="0 0 24 24" width="22" height="22" focusable="false">
+                <path d={tool.path} />
+              </svg>
+            ) : (
+              <span class="monogram">{tool.monogram}</span>
+            )}
+          </span>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .toolkit {
+    margin-top: clamp(7rem, 14svh, 11rem);
+    padding-top: 2rem;
+
+    border-top:
+      1px solid
+      color-mix(in srgb, var(--color-ink) 28%, transparent);
+  }
+
+  .toolkit-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: clamp(3rem, 6svh, 5rem);
+
+    font-family: var(--font-mono);
+
+    font-size: 0.625rem;
+
+    letter-spacing: 0.24em;
+
+    color: var(--color-ink);
+
+    opacity: 0.58;
+  }
+
+  .tools {
+    display: grid;
+
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    column-gap: clamp(4rem, 10vw, 12rem);
+  }
+
+  .tool {
+    display: grid;
+
+    /* Number, name, mark. The mark trails at the end of the row rather than
+       sitting beside the name, so every logo lands in the same column: aligned,
+       their different densities read as a column of stamps instead of a ransom
+       note. */
+    grid-template-columns:
+      2.6rem
+      minmax(0, 1fr)
+      auto;
+
+    align-items: center;
+
+    column-gap: 1rem;
+
+    padding:
+      1.4rem
+      0;
+
+    border-bottom:
+      1px dashed
+      color-mix(in srgb, var(--color-ink) 20%, transparent);
+
+    transition:
+      opacity 0.3s var(--ease-out),
+      padding-left 0.35s var(--ease-out),
+      background-color 0.3s var(--ease-out);
+  }
+
+  .number {
+    font-family: var(--font-mono);
+
+    align-self: center;
+
+    font-size: 0.625rem;
+
+    color: var(--color-gold-deep);
+
+    opacity: 0.7;
+  }
+
+  /* One box, one ink, one size. These are the only shapes on the site that are
+     not ours, so they are held to the tightest leash: never a brand's colour,
+     never larger than the number beside them. A wall of coloured logos is the
+     skills section this bench is deliberately not. */
+  .mark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    color: var(--color-ink-soft);
+    opacity: 0.72;
+    transition:
+      color 0.3s var(--ease-out),
+      opacity 0.3s var(--ease-out);
+  }
+
+  .mark svg {
+    display: block;
+    fill: currentColor;
+  }
+
+  /* What a tool gets when the set carries no mark for it. */
+  .monogram {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+  }
+
+  .tool-name {
+    font-family: var(--font-display);
+
+    font-size:
+      clamp(
+        1.35rem,
+        2.1vw,
+        1.9rem
+      );
+
+    letter-spacing: -0.015em;
+
+    color: var(--color-ink);
+
+    transition:
+      color 0.3s var(--ease-out),
+      transform 0.35s var(--ease-out);
+  }
+
+  @media (hover: hover) {
+    .tools:has(.tool:hover) .tool:not(:hover) {
+      opacity: 0.3;
+    }
+
+    .tool:hover {
+      padding-left: 0.75rem;
+
+      background:
+        color-mix(in srgb, var(--color-ink) 4%, transparent);
+    }
+
+    .tool:hover .tool-name {
+      color: var(--color-gold-deep);
+
+      transform: translateX(5px);
+    }
+
+    .tool:hover .mark {
+      color: var(--color-gold-deep);
+      opacity: 1;
+    }
+  }
+
+  @media (max-width: 52rem) {
+    .tools {
+      grid-template-columns: 1fr;
+    }
+
+    .toolkit-head span:last-child {
+      display: none;
+    }
+  }
+</style>

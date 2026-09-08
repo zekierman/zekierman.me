@@ -5,6 +5,14 @@
 export const locales = ['en', 'tr'] as const;
 export type Locale = (typeof locales)[number];
 
+// The name and the role are said twice on the page: once on arrival, once at the
+// foot. They are one fact, so they are written once. Two copies drift — the
+// footer was still introducing him as something he had stopped calling himself.
+const identity = {
+  en: { name: 'Zeki Erman', role: 'Computer Engineering · Product Builder' },
+  tr: { name: 'Zeki Erman', role: 'Bilgisayar Mühendisliği · Product Builder' },
+};
+
 export const copy = {
   en: {
     meta: {
@@ -28,8 +36,7 @@ export const copy = {
     arrival: {
       opening: ['I don’t really know', 'where this is going.'],
       aside: 'That’s usually why I start.',
-      name: 'Zeki Erman',
-      role: 'Computer Engineering · Creative Development',
+      ...identity.en,
       manifesto: ['I build things because I want to know', 'what happens if they exist.'],
     },
     // The projects themselves are a content collection now, one file each, so the
@@ -78,8 +85,7 @@ export const copy = {
     // The page ends on the name and the ways to reach it. No closing line: the
     // work has already made the case, and a sign-off after it only repeats.
     profile: {
-      name: 'Zeki Erman',
-      role: 'Computer Engineering · Creative Development',
+      ...identity.en,
       linksLabel: 'Elsewhere',
       links: [
         { label: 'GitHub', handle: 'zekierman', href: 'https://github.com/zekierman' },
@@ -123,8 +129,7 @@ export const copy = {
     arrival: {
       opening: ['Bunun nereye gittiğini', 'ben de bilmiyorum.'],
       aside: 'Genelde tam da bu yüzden başlıyorum.',
-      name: 'Zeki Erman',
-      role: 'Bilgisayar Mühendisliği · Creative Development',
+      ...identity.tr,
       manifesto: ['Aklıma takılan şeyleri sadece düşünmek yerine,', 'var etmeyi seviyorum.'],
     },
     work: {
@@ -168,8 +173,7 @@ export const copy = {
       ],
     },
     profile: {
-      name: 'Zeki Erman',
-      role: 'Bilgisayar Mühendisliği · Creative Development',
+      ...identity.tr,
       linksLabel: 'Başka yerlerde',
       links: [
         { label: 'GitHub', handle: 'zekierman', href: 'https://github.com/zekierman' },

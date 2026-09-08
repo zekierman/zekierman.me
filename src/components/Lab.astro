@@ -1,155 +1,1237 @@
 ---
 import { getCopy, metaParts, type Locale } from '../content/copy';
+import LabToolkit from './LabToolkit.astro';
+import GitHubActivity from './GitHubActivity.astro';
 
 interface Props {
   locale: Locale;
 }
+
 const { locale } = Astro.props;
 const t = getCopy(locale).lab;
 ---
 
 <section class="lab" id="the-lab">
-  <header class="head" data-reveal>
-    <h2 class="label">{t.label}</h2>
-    <p class="lead">{t.lead.map((line) => <span>{line}</span>)}</p>
-  </header>
+  <!-- Büyük dekoratif LAB yazısı -->
+  <div class="lab-watermark" aria-hidden="true">
+    LAB
+  </div>
 
-  <ul class="list">
-    {
-      t.items.map((item) => (
-        <li class="item" data-reveal>
-          <h3 class="name">
-            {item.href ? (
-              <a href={item.href} target="_blank" rel="noopener noreferrer">
-                {item.name}
-                <span class="arrow" aria-hidden="true">
-                  ↗
+  <!-- Teknik üst bilgi -->
+  <div class="lab-coordinates" aria-hidden="true">
+    <span>35°54′N</span>
+    <span>32°29′E</span>
+    <span>BUILD / TEST / BREAK / REPEAT</span>
+  </div>
+
+  <div class="inner">
+    <!-- HEADER -->
+    <header class="head" data-reveal>
+      <div class="head-top">
+        <h2 class="label">{t.label}</h2>
+
+        <span class="status" aria-hidden="true">
+          <span class="status-dot"></span>
+          EXPERIMENTAL
+        </span>
+      </div>
+
+      <p class="lead">
+        {t.lead.map((line) => <span>{line}</span>)}
+      </p>
+
+      <div class="lab-note" aria-hidden="true">
+        <span>OPEN WORKBENCH</span>
+        <span class="lab-note-line"></span>
+        <span>v0.x</span>
+      </div>
+    </header>
+
+    <!-- EXPERIMENT LIST -->
+    <ul class="list">
+      {
+        t.items.map((item, index) => {
+          const experimentNumber = String(index + 1).padStart(2, '0');
+
+          return (
+            <li
+              class="item"
+              data-reveal
+              data-exp={experimentNumber}
+            >
+              <!-- Experiment number -->
+              <div class="experiment-id" aria-hidden="true">
+                <span class="exp-prefix">EXP.</span>
+
+                <span class="exp-number">
+                  {experimentNumber}
                 </span>
-              </a>
-            ) : (
-              <span>{item.name}</span>
-            )}
-          </h3>
-          <p class="meta">{metaParts(item.meta).map((part) => (part.en ? <span lang="en">{part.text}</span> : part.text))}</p>
-          <p class="note">{item.note}</p>
-        </li>
-      ))
-    }
-  </ul>
+              </div>
+
+              <!-- Experiment title -->
+              <div class="item-main">
+                <h3 class="name">
+                  {item.href ? (
+                    <a
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {item.name}
+
+                      <span class="arrow" aria-hidden="true">
+                        ↗
+                      </span>
+                    </a>
+                  ) : (
+                    <span>{item.name}</span>
+                  )}
+                </h3>
+
+                <p class="meta">
+                  {metaParts(item.meta).map((part) =>
+                    part.en ? (
+                      <span lang="en">{part.text}</span>
+                    ) : (
+                      part.text
+                    )
+                  )}
+                </p>
+              </div>
+
+              <!-- Experiment description -->
+              <div class="item-note">
+                <p class="note">
+                  {item.note}
+                </p>
+
+                <div class="measurement" aria-hidden="true">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+            </li>
+          );
+        })
+      }
+    </ul>
+
+    <!-- CURRENT TOOLKIT -->
+    <LabToolkit />
+
+    <!-- GITHUB ACTIVITY -->
+    <GitHubActivity />
+
+    <!-- Alt teknik not -->
+    <div class="lab-footer-mark" aria-hidden="true">
+      <span>END OF CURRENT EXPERIMENTS</span>
+      <span class="footer-line"></span>
+      <span>MORE WILL BREAK</span>
+    </div>
+  </div>
 </section>
 
 <style>
-  /* No images here on purpose. The lab is the part that has not been packaged,
-     so it is presented the way it exists: as a list of things, plainly. */
+  /* ======================================================
+     LAB SURFACE
+  ====================================================== */
+
   .lab {
-    background: var(--color-light);
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+
     color: var(--color-ink);
-    padding: 0 6vw 26svh;
+
+    padding:
+      clamp(5rem, 12svh, 8.5rem)
+      6vw
+      clamp(8rem, 18svh, 13rem);
+
+    border-top:
+      1px solid
+      color-mix(in srgb, var(--color-ink) 15%, transparent);
+
+    border-bottom:
+      1px solid
+      color-mix(in srgb, var(--color-ink) 15%, transparent);
   }
+
+
+  /* ======================================================
+     DOTS + ENGINEERING GRID
+  ====================================================== */
+
+  .lab::before {
+    content: '';
+
+    position: absolute;
+    inset: 0;
+
+    z-index: 0;
+
+    pointer-events: none;
+
+    /*
+      Küçük dot pattern +
+      büyük teknik grid.
+    */
+    background-image:
+
+      /* Ana noktalar */
+      radial-gradient(
+        circle,
+        color-mix(in srgb, var(--color-ink) 23%, transparent) 1.15px,
+        transparent 1.3px
+      ),
+
+      /* Offset ikinci nokta katmanı */
+      radial-gradient(
+        circle,
+        color-mix(in srgb, var(--color-ink) 7%, transparent) 0.8px,
+        transparent 1px
+      ),
+
+      /* Büyük yatay grid */
+      linear-gradient(
+        color-mix(in srgb, var(--color-ink) 8%, transparent) 1px,
+        transparent 1px
+      ),
+
+      /* Büyük dikey grid */
+      linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--color-ink) 8%, transparent) 1px,
+        transparent 1px
+      );
+
+    background-size:
+      22px 22px,
+      22px 22px,
+      132px 132px,
+      132px 132px;
+
+    background-position:
+      0 0,
+      11px 11px,
+      0 0,
+      0 0;
+
+    opacity: 0.94;
+  }
+
+
+  /* ======================================================
+     INNER
+  ====================================================== */
+
+  .inner {
+    position: relative;
+
+    z-index: 3;
+
+    width: 100%;
+    max-width: 1600px;
+
+    margin: 0 auto;
+  }
+
+
+  /* ======================================================
+     GIANT LAB WATERMARK
+  ====================================================== */
+
+  .lab-watermark {
+    position: absolute;
+
+    top: clamp(2rem, 4vw, 4rem);
+    right: clamp(1.5rem, 5vw, 6rem);
+
+    z-index: 2;
+
+    font-family: var(--font-sans);
+
+    font-size:
+      clamp(
+        10rem,
+        22vw,
+        24rem
+      );
+
+    font-weight: 500;
+
+    line-height: 0.75;
+
+    letter-spacing: -0.09em;
+
+    color: var(--color-ink);
+
+    opacity: 0.11;
+
+    pointer-events: none;
+    user-select: none;
+  }
+
+
+  /* ======================================================
+     TOP TECHNICAL INFO
+  ====================================================== */
+
+  .lab-coordinates {
+    position: absolute;
+
+    top: 2rem;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    z-index: 3;
+
+    display: flex;
+    align-items: center;
+
+    gap: 1.6rem;
+
+    font-family: var(--font-mono);
+
+    font-size: 0.625rem;
+
+    letter-spacing: 0.24em;
+
+    color: var(--color-ink);
+
+    opacity: 0.46;
+
+    white-space: nowrap;
+
+    pointer-events: none;
+  }
+
+
+  /* ======================================================
+     HEADER
+  ====================================================== */
 
   .head {
-    padding-bottom: 12svh;
+    position: relative;
+
+    max-width: 52rem;
+
+    padding-bottom:
+      clamp(
+        6rem,
+        12svh,
+        10rem
+      );
   }
 
-  /* The section's name, and its heading. It is set small because the statement
-     under it is the loud part, but it is what names this section in the outline
-     a reader — or a crawler — walks. */
+  .head-top {
+    display: flex;
+    align-items: center;
+
+    gap: 1.6rem;
+
+    margin-bottom: 2.5rem;
+  }
+
+
+  /* ======================================================
+     LABEL
+  ====================================================== */
+
   .label {
-    margin: 0 0 2.4rem;
-    font-weight: 400;
-    font-size: 0.625rem;
-    letter-spacing: 0.34em;
+    margin: 0;
+
+    font-weight: 500;
+
+    font-size: 0.72rem;
+
+    letter-spacing: 0.32em;
+
     text-transform: uppercase;
+
     color: var(--color-gold-deep);
   }
 
+
+  /* ======================================================
+     EXPERIMENTAL STATUS
+  ====================================================== */
+
+  .status {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 0.6rem;
+
+    font-family: var(--font-mono);
+
+    font-size: 0.625rem;
+
+    letter-spacing: 0.24em;
+
+    color: var(--color-ink);
+
+    opacity: 0.65;
+  }
+
+  .status-dot {
+    width: 0.46rem;
+    height: 0.46rem;
+
+    border-radius: 999px;
+
+    background: var(--color-gold-deep);
+
+    box-shadow:
+      0 0 0
+      4px
+      color-mix(
+        in srgb,
+        var(--color-gold) 12%,
+        transparent
+      );
+  }
+
+
+  /* ======================================================
+     LEAD
+  ====================================================== */
+
   .lead {
     margin: 0;
-    max-width: 26ch;
+
+    max-width: 28ch;
+
     font-family: var(--font-display);
-    font-size: clamp(1.6rem, 4vw, 3rem);
-    line-height: 1.15;
-    letter-spacing: -0.012em;
+
+    /*
+      Önceki halden biraz daha büyük.
+    */
+    font-size:
+      clamp(
+        1.9rem,
+        4.4vw,
+        3.35rem
+      );
+
+    line-height: 1.12;
+
+    letter-spacing: -0.016em;
   }
 
   .lead span {
     display: block;
   }
 
+
+  /* ======================================================
+     WORKBENCH NOTE
+  ====================================================== */
+
+  .lab-note {
+    display: flex;
+    align-items: center;
+
+    gap: 1rem;
+
+    width: min(100%, 26rem);
+
+    margin-top: 3.2rem;
+
+    font-family: var(--font-mono);
+
+    font-size: 0.625rem;
+
+    letter-spacing: 0.24em;
+
+    color: var(--color-ink);
+
+    opacity: 0.54;
+  }
+
+  .lab-note-line {
+    flex: 1;
+
+    min-width: 2rem;
+
+    height: 1px;
+
+    background:
+      color-mix(in srgb, var(--color-ink) 34%, transparent);
+  }
+
+
+  /* ======================================================
+     EXPERIMENT LIST
+  ====================================================== */
+
   .list {
+    position: relative;
+
     list-style: none;
+
     margin: 0;
     padding: 0;
-    border-top: 1px solid color-mix(in srgb, var(--color-ink) 14%, transparent);
+
+    border-top:
+      1px dashed
+      color-mix(in srgb, var(--color-ink) 38%, transparent);
   }
+
+
+  /* ======================================================
+     EXPERIMENT ITEM
+  ====================================================== */
 
   .item {
-    padding: clamp(2rem, 4vw, 3.2rem) 0;
-    border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 14%, transparent);
+    position: relative;
+
+    isolation: isolate;
+
+    display: grid;
+
+    grid-template-columns:
+      minmax(5rem, 0.25fr)
+      minmax(0, 0.9fr)
+      minmax(0, 1.35fr);
+
+    column-gap:
+      clamp(
+        2rem,
+        5vw,
+        6rem
+      );
+
+    align-items: start;
+
+    /*
+      Yan padding hover paneli için.
+    */
+    padding:
+      clamp(
+        2.8rem,
+        5vw,
+        4.4rem
+      )
+      1.4rem;
+
+    margin-inline: -1.4rem;
+
+    border-bottom:
+      1px dashed
+      color-mix(in srgb, var(--color-ink) 34%, transparent);
+
+    background: transparent;
+
+    cursor: crosshair;
+
+    transition:
+      background 0.28s var(--ease-out),
+      box-shadow 0.32s var(--ease-out),
+      transform 0.42s var(--ease-out);
   }
 
-  @media (min-width: 60rem) {
-    .item {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
-      column-gap: 5vw;
-      align-items: start;
+
+  /* ======================================================
+     ACTIVE EXPERIMENT LABEL
+  ====================================================== */
+
+  .item::after {
+    content:
+      'ACTIVE // EXP.'
+      attr(data-exp);
+
+    position: absolute;
+
+    top: 1rem;
+    right: 1.35rem;
+
+    z-index: 5;
+
+    padding:
+      0.38rem
+      0.55rem;
+
+    font-family: var(--font-mono);
+
+    font-size: 0.625rem;
+
+    letter-spacing: 0.24em;
+
+    color: var(--color-gold-deep);
+
+    background:
+      color-mix(
+        in srgb,
+        var(--color-gold) 23%,
+        color-mix(in srgb, var(--color-ink) 4%, var(--color-light-edge))
+      );
+
+    border:
+      1px solid
+      color-mix(
+        in srgb,
+        var(--color-gold-deep) 35%,
+        transparent
+      );
+
+    opacity: 0;
+
+    transform:
+      translateY(-7px);
+
+    pointer-events: none;
+
+    transition:
+      opacity 0.25s var(--ease-out),
+      transform 0.35s var(--ease-out);
+  }
+
+
+  /* ======================================================
+     AGGRESSIVE ACTIVE HOVER
+  ====================================================== */
+
+  @media (hover: hover) and (pointer: fine) {
+    .item:hover {
+      /*
+        Belirgin sıcak / açık aktif panel.
+        Artık grid zeminden net ayrılıyor.
+      */
+      background:
+        linear-gradient(
+          90deg,
+          color-mix(in srgb, var(--color-gold-lift) 25%, transparent) 0%,
+          color-mix(in srgb, var(--color-light-edge) 88%, transparent) 18%,
+          color-mix(in srgb, var(--color-light-edge) 74%, transparent) 58%,
+          color-mix(in srgb, var(--color-light-edge) 52%, transparent) 100%
+        );
+
+      /*
+        Altın aktif rail + çerçeve + shadow.
+      */
+      box-shadow:
+        inset
+        6px
+        0
+        0
+        var(--color-gold-deep),
+
+        inset
+        0
+        0
+        0
+        1px
+        color-mix(in srgb, var(--color-ink) 22%, transparent),
+
+        0
+        18px
+        48px
+        color-mix(in srgb, var(--color-ink) 14%, transparent);
+
+      transform:
+        translateX(10px)
+        scale(1.008);
     }
-    .note {
-      grid-column: 2;
-      grid-row: 1 / span 2;
-      margin-top: 0;
+
+    .item:hover::after {
+      opacity: 1;
+
+      transform:
+        translateY(0);
+    }
+
+
+    /* EXP ID */
+    .item:hover .experiment-id {
+      transform:
+        translateX(9px);
+    }
+
+    .item:hover .exp-prefix {
+      opacity: 1;
+    }
+
+    .item:hover .exp-number {
+      color: var(--color-gold-deep);
+    }
+
+
+    /* Project title */
+    .item:hover .item-main {
+      transform:
+        translateX(11px);
+    }
+
+    .item:hover .name {
+      color: var(--color-gold-deep);
+    }
+
+    .item:hover .name a {
+      color: var(--color-gold-deep);
+
+      background-size:
+        100%
+        1px;
+    }
+
+    .item:hover .arrow {
+      transform:
+        translate(5px, -5px);
+    }
+
+
+    /* Description */
+    .item:hover .item-note {
+      transform:
+        translateX(8px);
+    }
+
+    .item:hover .note {
+      color: var(--color-ink);
+    }
+
+    .item:hover .meta {
+      opacity: 0.88;
+    }
+
+
+    /* Measurement marks */
+    .item:hover .measurement {
+      opacity: 1;
+    }
+
+    .item:hover .measurement span {
+      background:
+        var(--color-gold-deep);
+    }
+
+    .item:hover .measurement span:nth-child(1) {
+      transform: scaleY(1.8);
+    }
+
+    .item:hover .measurement span:nth-child(2) {
+      transform: scaleY(1.3);
+    }
+
+    .item:hover .measurement span:nth-child(3) {
+      transform: scaleY(2);
+    }
+
+    .item:hover .measurement span:nth-child(4) {
+      transform: scaleY(2.4);
+    }
+
+    .item:hover .measurement span:nth-child(5) {
+      transform: scaleY(1.5);
     }
   }
+
+
+  /* ======================================================
+     KEYBOARD ACTIVE
+  ====================================================== */
+
+  .item:focus-within {
+    background:
+      linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--color-gold-lift) 22%, transparent),
+        color-mix(in srgb, var(--color-light-edge) 82%, transparent)
+      );
+
+    box-shadow:
+      inset
+      6px
+      0
+      0
+      var(--color-gold-deep),
+
+      inset
+      0
+      0
+      0
+      1px
+      color-mix(in srgb, var(--color-ink) 22%, transparent);
+  }
+
+  .item:focus-within::after {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+
+
+  /* ======================================================
+     EXPERIMENT ID
+  ====================================================== */
+
+  .experiment-id {
+    display: flex;
+    align-items: baseline;
+
+    gap: 0.28rem;
+
+    padding-top: 0.15rem;
+
+    font-family: var(--font-mono);
+
+    /*
+      Büyütüldü.
+    */
+    font-size: 0.74rem;
+
+    letter-spacing: 0.12em;
+
+    color: var(--color-gold-deep);
+
+    transition:
+      transform 0.4s var(--ease-out);
+  }
+
+  .exp-prefix {
+    opacity: 0.58;
+
+    transition:
+      opacity 0.3s var(--ease-out);
+  }
+
+  .exp-number {
+    font-size: 1rem;
+
+    font-weight: 500;
+
+    color: var(--color-ink);
+
+    transition:
+      color 0.3s var(--ease-out);
+  }
+
+
+  /* ======================================================
+     ITEM MAIN
+  ====================================================== */
+
+  .item-main {
+    min-width: 0;
+
+    transition:
+      transform 0.4s var(--ease-out);
+  }
+
+
+  /* ======================================================
+     EXPERIMENT NAME
+  ====================================================== */
 
   .name {
     margin: 0;
+
     font-weight: 400;
-    font-size: clamp(1.15rem, 2.4vw, 1.75rem);
-    line-height: 1.2;
-    letter-spacing: -0.01em;
+
+    /*
+      Öncekinden belirgin şekilde büyük.
+    */
+    font-size:
+      clamp(
+        1.4rem,
+        2.7vw,
+        2rem
+      );
+
+    line-height: 1.15;
+
+    letter-spacing: -0.018em;
+
+    transition:
+      color 0.3s var(--ease-out);
   }
 
   .name a {
     color: inherit;
+
     text-decoration: none;
-    background-image: linear-gradient(currentColor, currentColor);
-    background-size: 0% 1px;
-    background-position: 0 100%;
-    background-repeat: no-repeat;
-    transition: background-size 0.5s var(--ease-out);
+
+    background-image:
+      linear-gradient(
+        var(--color-gold-deep),
+        var(--color-gold-deep)
+      );
+
+    background-size:
+      0%
+      1px;
+
+    background-position:
+      0
+      100%;
+
+    background-repeat:
+      no-repeat;
+
+    transition:
+      background-size 0.5s var(--ease-out),
+      color 0.3s var(--ease-out);
   }
 
   .name a:hover,
   .name a:focus-visible {
-    background-size: 100% 1px;
+    color:
+      var(--color-gold-deep);
+
+    background-size:
+      100%
+      1px;
   }
+
+
+  /* ======================================================
+     EXTERNAL ARROW
+  ====================================================== */
 
   .arrow {
     display: inline-block;
+
     margin-left: 0.4em;
-    font-size: 0.7em;
-    color: var(--color-gold-deep);
-    transition: transform 0.4s var(--ease-out);
+
+    font-size: 0.72em;
+
+    color:
+      var(--color-gold-deep);
+
+    transition:
+      transform 0.4s var(--ease-out);
   }
 
-  .name a:hover .arrow {
-    transform: translate(2px, -2px);
-  }
+
+  /* ======================================================
+     META
+  ====================================================== */
 
   .meta {
-    margin: 0.9rem 0 0;
+    margin:
+      1.05rem
+      0
+      0;
+
+    font-family: var(--font-mono);
+
+    /*
+      Biraz büyütüldü.
+    */
     font-size: 0.7rem;
-    letter-spacing: 0.14em;
+
+    letter-spacing: 0.12em;
+
     text-transform: uppercase;
-    color: var(--color-ink-soft);
+
+    color: var(--color-ink);
+
+    opacity: 0.58;
+
+    transition:
+      opacity 0.3s var(--ease-out);
+  }
+
+
+  /* ======================================================
+     DESCRIPTION
+  ====================================================== */
+
+  .item-note {
+    min-width: 0;
+
+    transition:
+      transform 0.4s var(--ease-out);
   }
 
   .note {
-    margin: 1.4rem 0 0;
-    max-width: 46ch;
-    font-size: clamp(0.95rem, 1.25vw, 1.05rem);
-    line-height: 1.65;
-    color: var(--color-ink-soft);
+    margin: 0;
+
+    max-width: 48ch;
+
+    /*
+      Açıklamalar da artık daha rahat okunuyor.
+    */
+    font-size:
+      clamp(
+        1rem,
+        1.35vw,
+        1.18rem
+      );
+
+    line-height: 1.68;
+
+    color:
+      var(--color-ink-soft);
+
+    transition:
+      color 0.3s var(--ease-out);
+  }
+
+
+  /* ======================================================
+     MEASUREMENT MARKS
+  ====================================================== */
+
+  .measurement {
+    display: flex;
+    align-items: flex-end;
+
+    gap: 0.48rem;
+
+    height: 1rem;
+
+    margin-top: 1.8rem;
+
+    opacity: 0.34;
+
+    transition:
+      opacity 0.3s var(--ease-out);
+  }
+
+  .measurement span {
+    display: block;
+
+    width: 1px;
+    height: 0.46rem;
+
+    background:
+      var(--color-ink);
+
+    transform-origin:
+      bottom;
+
+    transition:
+      transform 0.42s var(--ease-out),
+      background-color 0.3s var(--ease-out);
+  }
+
+  .measurement span:nth-child(2) {
+    transition-delay: 0.035s;
+  }
+
+  .measurement span:nth-child(3) {
+    height: 0.72rem;
+
+    transition-delay: 0.07s;
+  }
+
+  .measurement span:nth-child(4) {
+    transition-delay: 0.105s;
+  }
+
+  .measurement span:nth-child(5) {
+    transition-delay: 0.14s;
+  }
+
+
+  /* ======================================================
+     FOOTER TECHNICAL MARK
+  ====================================================== */
+
+  .lab-footer-mark {
+    display: flex;
+    align-items: center;
+
+    gap: 1rem;
+
+    margin-top: 2.4rem;
+
+    font-family: var(--font-mono);
+
+    font-size: 0.625rem;
+
+    letter-spacing: 0.24em;
+
+    color:
+      var(--color-ink);
+
+    opacity: 0.42;
+  }
+
+  .footer-line {
+    flex: 1;
+
+    height: 1px;
+
+    background:
+      color-mix(in srgb, var(--color-ink) 22%, transparent);
+  }
+
+
+  /* ======================================================
+     TABLET
+  ====================================================== */
+
+  @media (max-width: 64rem) {
+    .item {
+      grid-template-columns:
+        4.5rem
+        minmax(0, 1fr);
+
+      column-gap: 2rem;
+    }
+
+    .item-note {
+      grid-column: 2;
+
+      margin-top: 1.7rem;
+    }
+
+    .item::after {
+      display: none;
+    }
+  }
+
+
+  /* ======================================================
+     MOBILE
+  ====================================================== */
+
+  @media (max-width: 52rem) {
+    .lab {
+      padding:
+        5rem
+        1.5rem
+        8rem;
+    }
+
+    .lab::before {
+      background-size:
+        18px 18px,
+        18px 18px,
+        108px 108px,
+        108px 108px;
+
+      background-position:
+        0 0,
+        9px 9px,
+        0 0,
+        0 0;
+    }
+
+    .lab-watermark {
+      top: 3rem;
+      right: -0.5rem;
+
+      font-size:
+        clamp(
+          8rem,
+          38vw,
+          12rem
+        );
+
+      opacity: 0.09;
+    }
+
+    .lab-coordinates {
+      display: none;
+    }
+
+    .head {
+      padding-bottom: 5rem;
+    }
+
+    .head-top {
+      flex-wrap: wrap;
+
+      gap:
+        1rem
+        1.5rem;
+    }
+
+    .lead {
+      font-size:
+        clamp(
+          2rem,
+          8vw,
+          2.8rem
+        );
+    }
+
+    .item {
+      grid-template-columns:
+        1fr;
+
+      gap: 0;
+
+      padding:
+        2.7rem
+        0.75rem;
+
+      margin-inline:
+        -0.75rem;
+    }
+
+    .experiment-id {
+      margin-bottom: 1.4rem;
+    }
+
+    .name {
+      font-size:
+        clamp(
+          1.45rem,
+          7vw,
+          1.9rem
+        );
+    }
+
+    .note {
+      font-size:
+        1rem;
+    }
+
+    .item-note {
+      grid-column: auto;
+
+      margin-top: 1.7rem;
+    }
+
+    .lab-footer-mark {
+      display: none;
+    }
+  }
+
+
+  /* ======================================================
+     SMALL MOBILE
+  ====================================================== */
+
+  @media (max-width: 30rem) {
+    .lead span {
+      display: inline;
+    }
+
+    .lead span::after {
+      content: ' ';
+    }
+
+    .status {
+      font-size: 0.56rem;
+    }
+  }
+
+
+  /* ======================================================
+     REDUCED MOTION
+  ====================================================== */
+
+  @media (prefers-reduced-motion: reduce) {
+    .item,
+    .item::after,
+    .experiment-id,
+    .item-main,
+    .item-note,
+    .measurement,
+    .measurement span,
+    .arrow {
+      transition: none;
+    }
   }
 </style>

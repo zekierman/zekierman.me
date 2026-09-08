@@ -1,5 +1,5 @@
 import { defineCollection, z } from 'astro:content';
-import { glob } from 'astro/loaders';
+import { file, glob } from 'astro/loaders';
 
 /**
  * The work is data, not copy. It lives one file per project so the admin panel can
@@ -29,4 +29,23 @@ const projects = defineCollection({
   }),
 });
 
-export const collections = { projects };
+/**
+ * The bench inventory. One file rather than one file per tool: the list is short,
+ * it is reordered far more often than it is added to, and reordering a single
+ * array is one write instead of renumbering eleven documents.
+ *
+ * `icon` is a simple-icons slug, resolved at build time. It is allowed to be empty
+ * — not every tool has a mark that may be redistributed (Azure is one), and a tool
+ * without a logo still belongs on the bench. The component falls back to a
+ * monogram, so an unknown slug degrades instead of breaking the build.
+ */
+const toolkit = defineCollection({
+  loader: file('src/content/toolkit.json'),
+  schema: z.object({
+    order: z.number().int().positive(),
+    name: z.string().min(1).max(40),
+    icon: z.string().regex(/^[a-z0-9.-]*$/).max(40),
+  }),
+});
+
+export const collections = { projects, toolkit };

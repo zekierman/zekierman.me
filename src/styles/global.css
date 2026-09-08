@@ -24,8 +24,18 @@
   --color-ink: #14110d;
   --color-ink-soft: #4a453d;
 
+  /* The bench: the Lab's own surface. Not sampled from the film — derived from
+     two colours that were, so the room reads as a different room without leaving
+     the world. `light-edge` carrying 8% ink: the page's paper, set down a stop.
+     A cool grey here (the obvious choice) put Lab in a different building. */
+  --color-bench: #e2e0d7;
+
   --font-display: var(--font-serif);
   --font-body: var(--font-sans);
+  /* Measurement, not decoration: experiment numbers, coordinates, counts. The
+     stack is the system's, deliberately — a third self-hosted face would cost a
+     request for two dozen characters. One token, so swapping it later is one line. */
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -105,39 +115,25 @@ html {
   }
 }
 
-/* The light sections — Arrival, Work, Lab, Context — share a tactile ground
-   rather than flat white: a visible yet refined halftone dot field derived from the
-   brand mark, with directional washes of the film's gold light shifting naturally
-   across sections like sunlight moving across paper. */
+/* The light content sections — Work, Lab, Context — share a tactile ground:
+   a distinct halftone dot field derived from the brand mark, separated by
+   clean hairline dividers, with directional washes of the film's gold light
+   shifting naturally across sections like sunlight moving across paper. */
 :is(#arrival, #things-i-chased, #the-lab, #context) {
   background-color: var(--color-light);
 }
 
+/* Arrival sits directly under Hero. Kept clean without dot grid or washes so
+   the hero's bleach and dissolve melts into it seamlessly without creating
+   a harsh card/tag boundary. */
 #arrival {
-  background-image:
-    /* Primary wash: doorway light entering from top-left */
-    radial-gradient(
-      ellipse 80% 65% at 0% 0%,
-      color-mix(in srgb, var(--color-gold) 12%, transparent) 0%,
-      color-mix(in srgb, var(--color-threshold) 7%, transparent) 40%,
-      transparent 75%
-    ),
-    /* Secondary wash: soft warmth on mid-right */
-    radial-gradient(
-      ellipse 55% 45% at 100% 60%,
-      color-mix(in srgb, var(--color-gold) 7%, transparent) 0%,
-      color-mix(in srgb, var(--color-threshold) 4%, transparent) 35%,
-      transparent 70%
-    ),
-    /* Halftone field: 24px cell, 10% ink, sub-pixel antialiased */
-    radial-gradient(
-      circle at 1px 1px,
-      color-mix(in srgb, var(--color-ink) 10%, transparent) 0.85px,
-      transparent 1.4px
-    );
-  background-size: 100% 100%, 100% 100%, 24px 24px;
-  background-position: 0 0, 0 0, 0 0;
-  background-repeat: no-repeat, no-repeat, repeat;
+  background-image: none;
+}
+
+/* Clean hairline divider lines between the sections with generous breathing room */
+:is(#things-i-chased, #the-lab, #context) {
+  border-top: 1px solid color-mix(in srgb, var(--color-ink) 14%, transparent);
+  padding-top: clamp(5rem, 12svh, 8.5rem);
 }
 
 #things-i-chased {
@@ -145,52 +141,35 @@ html {
     /* Primary wash: light shifts to right edge */
     radial-gradient(
       ellipse 70% 50% at 100% 30%,
-      color-mix(in srgb, var(--color-gold) 12%, transparent) 0%,
-      color-mix(in srgb, var(--color-threshold) 6%, transparent) 40%,
+      color-mix(in srgb, var(--color-gold) 10%, transparent) 0%,
+      color-mix(in srgb, var(--color-threshold) 5%, transparent) 40%,
       transparent 75%
     ),
     /* Secondary wash: lower-left accent */
     radial-gradient(
       ellipse 65% 45% at 0% 75%,
-      color-mix(in srgb, var(--color-gold) 8%, transparent) 0%,
-      color-mix(in srgb, var(--color-threshold) 4%, transparent) 35%,
+      color-mix(in srgb, var(--color-gold) 7%, transparent) 0%,
+      color-mix(in srgb, var(--color-threshold) 3%, transparent) 35%,
       transparent 70%
     ),
-    /* Halftone field */
+    /* Halftone field: enlarged 28px cell, 1.25px dot core with 1.85px antialias */
     radial-gradient(
       circle at 1px 1px,
-      color-mix(in srgb, var(--color-ink) 10%, transparent) 0.85px,
-      transparent 1.4px
+      color-mix(in srgb, var(--color-ink) 12%, transparent) 1.25px,
+      transparent 1.85px
     );
-  background-size: 100% 100%, 100% 100%, 24px 24px;
+  background-size: 100% 100%, 100% 100%, 28px 28px;
   background-position: 0 0, 0 0, 0 0;
   background-repeat: no-repeat, no-repeat, repeat;
 }
 
+/* Lab is deliberately a different room and brings its own ground — a bench
+   surface, its own dot field and an engineering grid. It is left out of the
+   wash-and-halftone treatment above rather than being given one and then
+   overriding it: two dot fields were stacking, which is what made the surface
+   read as muddy rather than technical. One owner per surface. */
 #the-lab {
-  background-image:
-    /* Primary wash: light shifts to left edge */
-    radial-gradient(
-      ellipse 70% 55% at 0% 45%,
-      color-mix(in srgb, var(--color-gold) 11%, transparent) 0%,
-      color-mix(in srgb, var(--color-threshold) 6%, transparent) 40%,
-      transparent 75%
-    ),
-    /* Secondary wash: subtle top-right counterweight */
-    radial-gradient(
-      ellipse 55% 40% at 100% 15%,
-      color-mix(in srgb, var(--color-gold) 6%, transparent) 0%,
-      transparent 65%
-    ),
-    /* Halftone field */
-    radial-gradient(
-      circle at 1px 1px,
-      color-mix(in srgb, var(--color-ink) 10%, transparent) 0.85px,
-      transparent 1.4px
-    );
-  background-size: 100% 100%, 100% 100%, 24px 24px;
-  background-position: 0 0, 0 0, 0 0;
-  background-repeat: no-repeat, no-repeat, repeat;
+  background-color: var(--color-bench);
 }
 
 #context {
@@ -207,16 +186,11 @@ html {
       ellipse 60% 45% at 0% 70%,
       color-mix(in srgb, var(--color-gold) 7%, transparent) 0%,
       transparent 65%
-    ),
-    /* Halftone field */
-    radial-gradient(
-      circle at 1px 1px,
-      color-mix(in srgb, var(--color-ink) 10%, transparent) 0.85px,
-      transparent 1.4px
     );
-  background-size: 100% 100%, 100% 100%, 24px 24px;
-  background-position: 0 0, 0 0, 0 0;
-  background-repeat: no-repeat, no-repeat, repeat;
+  background-size: 100% 100%, 100% 100%;
+  background-position: 0 0, 0 0;
+  background-repeat: no-repeat, no-repeat;
 }
+
 
 

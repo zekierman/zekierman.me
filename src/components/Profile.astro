@@ -86,18 +86,75 @@ const t = getCopy(locale).profile;
 </footer>
 
 <style>
-  /* Not a cut. The light drains through the gold it was made of — the same ramp
-     the doorway ran, played backwards — so the dark is arrived at, not switched to. */
+  /* A seamless dissolve from the light world's warm cream into the dark void,
+     passing naturally through the doorway's gold without any white flash or flat pauses. */
   .threshold {
-    height: clamp(9rem, 20svh, 15rem);
+    position: relative;
+    overflow: hidden;
+    height: clamp(8rem, 17svh, 13rem);
+    /* sRGB first: a browser without interpolation hints still gets the ramp
+       rather than no background at all. */
     background: linear-gradient(
       to bottom,
-      var(--color-light-edge) 0%,
-      var(--color-light-edge) 46%,
-      color-mix(in srgb, var(--color-gold-deep) 62%, var(--color-void)) 80%,
+      var(--color-light) 0%,
+      color-mix(in srgb, var(--color-gold) 24%, var(--color-light)) 26%,
+      color-mix(in srgb, var(--color-gold-deep) 52%, var(--color-void)) 64%,
+      var(--color-void) 100%
+    );
+    /* oklab where it is understood: sRGB interpolation drags this ramp through a
+       muddy olive on the way down, because it crosses the gamut in a straight
+       line rather than through what the eye reads as the same light dimming. */
+    background: linear-gradient(
+      to bottom in oklab,
+      var(--color-light) 0%,
+      color-mix(in oklab, var(--color-gold) 24%, var(--color-light)) 26%,
+      color-mix(in oklab, var(--color-gold-deep) 52%, var(--color-void)) 64%,
       var(--color-void) 100%
     );
   }
+
+  /* The light does not end at a line, it breaks up.
+
+     A halftone screen is a regular grid: what varies down a printed gradient is
+     the diameter of the dot, not where it sits. So both layers share one cell and
+     one origin — they line up exactly — and the dots simply get smaller as the
+     light gives out. Two coprime cells were tried first and read as interference
+     rather than as a screen. This is the same thing an ink gradient does on press,
+     and the same halftone the brand mark is built from. */
+  .threshold::before,
+  .threshold::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-repeat: repeat;
+    background-position: 0 0;
+    background-size: 10px 10px;
+  }
+
+  /* Coarse screen: the light still mostly solid, opening up. */
+  .threshold::before {
+    background-image: radial-gradient(
+      circle at 5px 5px,
+      var(--color-light) 2px,
+      transparent 2.6px
+    );
+    -webkit-mask-image: linear-gradient(to bottom, transparent 22%, #000 42%, transparent 66%);
+    mask-image: linear-gradient(to bottom, transparent 22%, #000 42%, transparent 66%);
+  }
+
+  /* Fine screen: the last of it, thinning into the dark. */
+  .threshold::after {
+    background-image: radial-gradient(
+      circle at 5px 5px,
+      color-mix(in srgb, var(--color-threshold) 78%, transparent) 1.05px,
+      transparent 1.6px
+    );
+    -webkit-mask-image: linear-gradient(to bottom, transparent 48%, #000 68%, transparent 88%);
+    mask-image: linear-gradient(to bottom, transparent 48%, #000 68%, transparent 88%);
+  }
+
+
 
   .profile {
     position: relative;
@@ -105,7 +162,7 @@ const t = getCopy(locale).profile;
     overflow: hidden;
     background: var(--color-void);
     color: var(--color-light);
-    padding: 16svh max(6vw, 2.5rem) 8svh;
+    padding: clamp(4rem, 10svh, 7rem) max(6vw, 2.5rem) 8svh;
   }
 
   /* Two radial ramps of gold light landing across the dark ground, cancelling

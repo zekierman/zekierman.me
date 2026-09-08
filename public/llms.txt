@@ -9,7 +9,7 @@
 
 ### Identity & Education
 - Name: Zeki Erman
-- Role: Computer Engineering · Creative Development
+- Role: Computer Engineering · Product Builder
 - University: Necmettin Erbakan Üniversitesi (3rd-year Computer Engineering student)
 - Focus: Building web and mobile products, crossing the distance from "Can I build this?" to shipping real software that people run on their phones.
 
@@ -36,7 +36,7 @@
 
 ### Kimlik ve Eğitim
 - İsim: Zeki Erman
-- Rol: Bilgisayar Mühendisliği · Creative Development
+- Rol: Bilgisayar Mühendisliği · Product Builder
 - Üniversite: Necmettin Erbakan Üniversitesi (3. sınıf Bilgisayar Mühendisliği öğrencisi)
 - Odak: Fikirle çalışan kod arasındaki mesafeyi kapatan, insanların telefonlarında ve tarayıcılarında çalışan web ve mobil ürünler geliştirmek.
 

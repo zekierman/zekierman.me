@@ -3,6 +3,7 @@ dist/
 .astro/
 .DS_Store
 *.log
+.env
 
 # Master footage lives here and is far too large for git.
 # Web derivatives in public/media/ are generated from it by tools/encode.sh

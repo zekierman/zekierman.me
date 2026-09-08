@@ -128,6 +128,27 @@
           <p class="note">Kaydedince site yeniden derlenir. Birkaç saniye sürer.</p>
         </form>
 
+        <h2>Tezgâh envanteri</h2>
+        <p class="note">
+          Lab'daki <strong>CURRENT TOOLKIT</strong> listesi. Sıra burada ne ise sayfada
+          da o — numaralar sıradan türetiliyor, elle yazılmıyor.
+        </p>
+        <div id="tools"></div>
+        <button id="toolAdd" class="ghost" type="button">Satır ekle</button>
+        <button id="toolSave" type="button">Kaydet ve yayına al</button>
+
+        <h2>Ayarlar</h2>
+        <div class="field">
+          <label for="ghUser">GitHub kullanıcı adı</label>
+          <input id="ghUser" placeholder="zekierman" />
+          <p class="note">
+            Lab'daki katkı grafiği bu hesabı gösterir. Erişim anahtarı burada
+            <strong>tutulmaz</strong> — o sunucunun ortam değişkeninde kalır ve panelden
+            ne okunabilir ne yazılabilir.
+          </p>
+        </div>
+        <button id="settingsSave" type="button">Kaydet</button>
+
         <h2>Oturum</h2>
         <button id="signout" class="ghost">Çıkış</button>
       </section>
@@ -159,7 +180,11 @@
       function show(signedIn) {
         $('gate').hidden = signedIn;
         $('panel').hidden = !signedIn;
-        if (signedIn) load();
+        if (signedIn) {
+          load();
+          loadTools();
+          loadSettings();
+        }
       }
 
       async function load() {
@@ -236,6 +261,106 @@
         }
       };
       $('pw').onkeydown = (e) => e.key === 'Enter' && $('signin').click();
+
+      // ---- tezgâh envanteri ----
+      let tools = [];
+
+      function drawTools() {
+        const box = $('tools');
+        box.innerHTML = '';
+        tools.forEach((tool, i) => {
+          const row = document.createElement('div');
+          row.className = 'item';
+
+          const name = document.createElement('input');
+          name.value = tool.name || '';
+          name.placeholder = 'TypeScript';
+          name.oninput = () => {
+            tool.name = name.value;
+            // The id follows the name only while the row is new; renaming an
+            // existing tool must not silently move it to a different record.
+            if (tool.isNew) tool.id = name.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+          };
+
+          const icon = document.createElement('input');
+          icon.value = tool.icon || '';
+          icon.placeholder = 'simple-icons kısa adı (boş = monogram)';
+          icon.oninput = () => { tool.icon = icon.value.trim().toLowerCase(); };
+
+          const up = document.createElement('button');
+          up.className = 'ghost';
+          up.textContent = '↑';
+          up.disabled = i === 0;
+          up.onclick = () => { [tools[i - 1], tools[i]] = [tools[i], tools[i - 1]]; drawTools(); };
+
+          const down = document.createElement('button');
+          down.className = 'ghost';
+          down.textContent = '↓';
+          down.disabled = i === tools.length - 1;
+          down.onclick = () => { [tools[i + 1], tools[i]] = [tools[i], tools[i + 1]]; drawTools(); };
+
+          const del = document.createElement('button');
+          del.className = 'danger';
+          del.textContent = 'Sil';
+          del.onclick = () => { tools.splice(i, 1); drawTools(); };
+
+          const n = document.createElement('small');
+          n.textContent = String(i + 1).padStart(2, '0');
+
+          const grow = document.createElement('div');
+          grow.className = 'grow';
+          grow.append(name, icon);
+          row.append(n, grow, up, down, del);
+          box.append(row);
+        });
+      }
+
+      $('toolAdd').onclick = () => {
+        tools.push({ id: '', name: '', icon: '', isNew: true });
+        drawTools();
+      };
+
+      $('toolSave').onclick = async () => {
+        $('toolSave').disabled = true;
+        say('Yayına alınıyor…', true);
+        try {
+          await api('/toolkit', {
+            method: 'PUT',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ toolkit: tools.map(({ id, name, icon }) => ({ id, name, icon })) }),
+          });
+          say('Envanter yayında.', true);
+          loadTools();
+        } catch (e) {
+          say(e.message);
+        } finally {
+          $('toolSave').disabled = false;
+        }
+      };
+
+      async function loadTools() {
+        const data = await api('/toolkit');
+        tools = data.toolkit || [];
+        drawTools();
+      }
+
+      async function loadSettings() {
+        const { settings } = await api('/settings');
+        $('ghUser').value = settings.githubUsername || '';
+      }
+
+      $('settingsSave').onclick = async () => {
+        try {
+          await api('/settings', {
+            method: 'PUT',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ githubUsername: $('ghUser').value.trim() }),
+          });
+          say('Ayarlar kaydedildi.', true);
+        } catch (e) {
+          say(e.message);
+        }
+      };
 
       $('signout').onclick = async () => {
         await api('/logout', { method: 'POST' });

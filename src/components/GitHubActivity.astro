@@ -1,0 +1,830 @@
+---
+import dns from 'node:dns';
+
+dns.setDefaultResultOrder('ipv4first');
+
+const username = 'zekierman';
+const token = import.meta.env.GITHUB_TOKEN;
+
+interface ContributionDay {
+  contributionCount: number;
+  contributionLevel:
+    | 'NONE'
+    | 'FIRST_QUARTILE'
+    | 'SECOND_QUARTILE'
+    | 'THIRD_QUARTILE'
+    | 'FOURTH_QUARTILE';
+  date: string;
+  weekday: number;
+}
+
+interface ContributionWeek {
+  contributionDays: ContributionDay[];
+}
+
+interface ContributionCalendar {
+  totalContributions: number;
+  weeks: ContributionWeek[];
+}
+
+let calendar: ContributionCalendar | null = null;
+let githubError = false;
+
+if (token) {
+  const query = `
+    query($login: String!) {
+      user(login: $login) {
+        contributionsCollection {
+          contributionCalendar {
+            totalContributions
+            weeks {
+              contributionDays {
+                contributionCount
+                contributionLevel
+                date
+                weekday
+              }
+            }
+          }
+        }
+      }
+    }
+  `;
+
+  try {
+    const response = await fetch('https://api.github.com/graphql', {
+      method: 'POST',
+
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'User-Agent': 'zekierman.me',
+      },
+
+      body: JSON.stringify({
+        query,
+        variables: {
+          login: username,
+        },
+      }),
+    });
+
+    if (!response.ok) {
+      githubError = true;
+      console.error(
+        `GitHub API error: ${response.status} ${response.statusText}`
+      );
+    } else {
+      const result = await response.json();
+
+      if (result.errors) {
+        githubError = true;
+        console.error('GitHub GraphQL errors:', result.errors);
+      } else {
+        calendar =
+          result?.data?.user?.contributionsCollection
+            ?.contributionCalendar ?? null;
+      }
+    }
+  } catch (error) {
+    githubError = true;
+    console.error('GitHub activity could not be loaded:', error);
+  }
+} else {
+  githubError = true;
+  console.error('GITHUB_TOKEN is missing.');
+}
+
+function levelClass(
+  level: ContributionDay['contributionLevel']
+) {
+  switch (level) {
+    case 'FIRST_QUARTILE':
+      return 'level-1';
+
+    case 'SECOND_QUARTILE':
+      return 'level-2';
+
+    case 'THIRD_QUARTILE':
+      return 'level-3';
+
+    case 'FOURTH_QUARTILE':
+      return 'level-4';
+
+    default:
+      return 'level-0';
+  }
+}
+---
+
+<section
+  class="github-activity"
+  data-reveal
+  aria-labelledby="github-activity-title"
+>
+  <div class="activity-head">
+    <div class="activity-heading">
+      <div class="eyebrow-row">
+        <span
+          class="status-dot"
+          aria-hidden="true"
+        ></span>
+
+        <p
+          class="eyebrow"
+          id="github-activity-title"
+        >
+          GITHUB ACTIVITY // LAST 12 MONTHS
+        </p>
+      </div>
+
+      {
+        calendar && (
+          <p class="total">
+            <span>{calendar.totalContributions}</span>
+            contributions
+          </p>
+        )
+      }
+    </div>
+
+    <a
+      class="github-link"
+      href={`https://github.com/${username}`}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      github.com/{username}
+
+      <span
+        class="link-arrow"
+        aria-hidden="true"
+      >
+        ↗
+      </span>
+    </a>
+  </div>
+
+
+  {
+    calendar ? (
+      <div class="graph-shell">
+        <div class="graph-scroll">
+          <div class="graph">
+            {
+              calendar.weeks.map((week) => (
+                <div class="week">
+                  {
+                    week.contributionDays.map((day) => (
+                      <span
+                        class={`day ${levelClass(
+                          day.contributionLevel
+                        )}`}
+                        style={`grid-row: ${
+                          day.weekday + 1
+                        };`}
+                        title={`${day.date} · ${day.contributionCount} contributions`}
+                        aria-label={`${day.date}: ${day.contributionCount} contributions`}
+                      />
+                    ))
+                  }
+                </div>
+              ))
+            }
+          </div>
+        </div>
+
+        <div class="graph-footer">
+          <div class="graph-status">
+            <span aria-hidden="true">
+              SYS.ACTIVITY
+            </span>
+
+            <span aria-hidden="true">
+              52W
+            </span>
+          </div>
+
+          <div
+            class="legend"
+            aria-hidden="true"
+          >
+            <span class="legend-text">
+              LESS
+            </span>
+
+            <span class="legend-square level-0"></span>
+            <span class="legend-square level-1"></span>
+            <span class="legend-square level-2"></span>
+            <span class="legend-square level-3"></span>
+            <span class="legend-square level-4"></span>
+
+            <span class="legend-text">
+              MORE
+            </span>
+          </div>
+        </div>
+      </div>
+    ) : (
+      <div class="offline">
+        <div>
+          <span class="offline-code">
+            ERR.GH.01
+          </span>
+
+          <p>
+            ACTIVITY FEED OFFLINE
+          </p>
+        </div>
+
+        <span class="offline-detail">
+          {
+            githubError
+              ? 'CHECK API CONNECTION'
+              : 'NO ACTIVITY DATA'
+          }
+        </span>
+      </div>
+    )
+  }
+</section>
+
+
+<style>
+  /* ======================================================
+     GITHUB ACTIVITY
+  ====================================================== */
+
+  .github-activity {
+    margin-top:
+      clamp(
+        7rem,
+        14svh,
+        11rem
+      );
+
+    padding-top: 2rem;
+
+    border-top:
+      1px solid
+      color-mix(in srgb, var(--color-ink) 28%, transparent);
+  }
+
+
+  /* ======================================================
+     HEADER
+  ====================================================== */
+
+  .activity-head {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: flex-end;
+
+    gap: 3rem;
+
+    margin-bottom:
+      clamp(
+        3rem,
+        6svh,
+        5rem
+      );
+  }
+
+  .activity-heading {
+    min-width: 0;
+  }
+
+  .eyebrow-row {
+    display: flex;
+    align-items: center;
+
+    gap: 0.65rem;
+  }
+
+  .status-dot {
+    display: block;
+
+    width: 0.42rem;
+    height: 0.42rem;
+
+    flex: 0 0 auto;
+
+    border-radius: 50%;
+
+    background:
+      var(--color-gold-deep);
+
+    box-shadow:
+      0
+      0
+      0
+      4px
+      color-mix(
+        in srgb,
+        var(--color-gold) 12%,
+        transparent
+      );
+  }
+
+  .eyebrow {
+    margin: 0;
+
+    font-family: var(--font-mono);
+
+    font-size: 0.625rem;
+
+    letter-spacing: 0.24em;
+
+    color:
+      var(--color-ink);
+
+    opacity: 0.62;
+  }
+
+
+  /* ======================================================
+     TOTAL
+  ====================================================== */
+
+  .total {
+    display: flex;
+    align-items: baseline;
+
+    gap: 0.6rem;
+
+    margin:
+      1.2rem
+      0
+      0;
+
+    font-family: var(--font-mono);
+
+    font-size: 0.625rem;
+
+    letter-spacing: 0.08em;
+
+    text-transform: uppercase;
+
+    color:
+      var(--color-ink);
+
+    opacity: 0.58;
+  }
+
+  .total span {
+    font-family:
+      var(--font-display);
+
+    font-size:
+      clamp(
+        1.9rem,
+        3vw,
+        2.8rem
+      );
+
+    line-height: 1;
+
+    letter-spacing: -0.025em;
+
+    color:
+      var(--color-ink);
+
+    opacity: 1;
+  }
+
+
+  /* ======================================================
+     GITHUB LINK
+  ====================================================== */
+
+  .github-link {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 0.35rem;
+
+    flex-shrink: 0;
+
+    padding-bottom: 0.25rem;
+
+    font-family: var(--font-mono);
+
+    font-size: 0.625rem;
+
+    letter-spacing: 0.08em;
+
+    color:
+      var(--color-gold-deep);
+
+    text-decoration: none;
+
+    border-bottom:
+      1px solid
+      color-mix(
+        in srgb,
+        var(--color-gold-deep) 28%,
+        transparent
+      );
+
+    transition:
+      color 0.3s var(--ease-out),
+      border-color 0.3s var(--ease-out);
+  }
+
+  .link-arrow {
+    display: inline-block;
+
+    transition:
+      transform 0.35s var(--ease-out);
+  }
+
+  .github-link:hover {
+    color:
+      var(--color-ink);
+
+    border-color:
+      var(--color-gold-deep);
+  }
+
+  .github-link:hover .link-arrow {
+    transform:
+      translate(
+        3px,
+        -3px
+      );
+  }
+
+
+  /* ======================================================
+     GRAPH PANEL
+  ====================================================== */
+
+  .graph-shell {
+    position: relative;
+
+    padding:
+      clamp(
+        1.5rem,
+        3vw,
+        2.4rem
+      );
+
+    background:
+      color-mix(
+        in srgb,
+        var(--color-light-edge) 46%,
+        transparent
+      );
+
+    border:
+      1px solid
+      color-mix(
+        in srgb,
+        var(--color-ink) 18%,
+        transparent
+      );
+
+    box-shadow:
+      inset
+      4px
+      0
+      0
+      color-mix(
+        in srgb,
+        var(--color-gold-deep) 68%,
+        transparent
+      ),
+      0
+      18px
+      50px
+      color-mix(
+        in srgb,
+        var(--color-ink) 7%,
+        transparent
+      );
+
+    overflow: hidden;
+  }
+
+
+  /* ======================================================
+     GRAPH
+  ====================================================== */
+
+  .graph-scroll {
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    padding-bottom: 0.5rem;
+
+    scrollbar-width: thin;
+
+    scrollbar-color:
+      color-mix(in srgb, var(--color-ink) 25%, transparent)
+      transparent;
+  }
+
+  .graph {
+    display: flex;
+
+    gap: 4px;
+
+    width: max-content;
+
+    min-width: 100%;
+  }
+
+  .week {
+    display: grid;
+
+    grid-template-rows:
+      repeat(
+        7,
+        11px
+      );
+
+    gap: 4px;
+
+    flex: 0 0 auto;
+  }
+
+
+  /* ======================================================
+     CONTRIBUTION DAY
+  ====================================================== */
+
+  .day,
+  .legend-square {
+    display: block;
+
+    width: 11px;
+    height: 11px;
+
+    border-radius: 1px;
+  }
+
+  .day {
+    position: relative;
+
+    outline:
+      1px solid
+      color-mix(
+        in srgb,
+        var(--color-ink) 5.5%,
+        transparent
+      );
+
+    transition:
+      transform 0.18s var(--ease-out),
+      box-shadow 0.18s var(--ease-out),
+      filter 0.18s var(--ease-out);
+  }
+
+  .day:hover {
+    z-index: 5;
+
+    transform:
+      scale(1.65);
+
+    filter:
+      brightness(0.94);
+
+    box-shadow:
+      0
+      0
+      0
+      2px
+      var(--color-bench),
+      0
+      4px
+      14px
+      color-mix(
+        in srgb,
+        var(--color-ink) 22%,
+        transparent
+      );
+  }
+
+
+  /* ======================================================
+     CONTRIBUTION LEVELS
+  ====================================================== */
+
+  .level-0 {
+    background:
+      color-mix(
+        in srgb,
+        var(--color-ink) 7%,
+        transparent
+      );
+  }
+
+  .level-1 {
+    background:
+      color-mix(
+        in srgb,
+        var(--color-gold) 30%,
+        color-mix(in srgb, var(--color-ink) 12%, var(--color-light-edge))
+      );
+  }
+
+  .level-2 {
+    background:
+      color-mix(
+        in srgb,
+        var(--color-gold) 56%,
+        color-mix(in srgb, var(--color-ink) 12%, var(--color-light-edge))
+      );
+  }
+
+  .level-3 {
+    background:
+      var(--color-gold);
+  }
+
+  .level-4 {
+    background:
+      var(--color-gold-deep);
+  }
+
+
+  /* ======================================================
+     GRAPH FOOTER
+  ====================================================== */
+
+  .graph-footer {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 2rem;
+
+    margin-top: 1.7rem;
+
+    padding-top: 1.2rem;
+
+    border-top:
+      1px dashed
+      color-mix(
+        in srgb,
+        var(--color-ink) 17%,
+        transparent
+      );
+  }
+
+  .graph-status {
+    display: flex;
+
+    gap: 1.4rem;
+
+    font-family: var(--font-mono);
+
+    font-size: 0.5rem;
+
+    letter-spacing: 0.12em;
+
+    color:
+      var(--color-ink);
+
+    opacity: 0.42;
+  }
+
+
+  /* ======================================================
+     LEGEND
+  ====================================================== */
+
+  .legend {
+    display: flex;
+    align-items: center;
+
+    gap: 0.38rem;
+  }
+
+  .legend-text {
+    margin:
+      0
+      0.25rem;
+
+    font-family: var(--font-mono);
+
+    font-size: 0.48rem;
+
+    letter-spacing: 0.11em;
+
+    color:
+      var(--color-ink);
+
+    opacity: 0.48;
+  }
+
+
+  /* ======================================================
+     OFFLINE FALLBACK
+  ====================================================== */
+
+  .offline {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 2rem;
+
+    padding:
+      2rem
+      2rem;
+
+    background:
+      color-mix(
+        in srgb,
+        var(--color-light-edge) 28%,
+        transparent
+      );
+
+    border:
+      1px dashed
+      color-mix(
+        in srgb,
+        var(--color-ink) 28%,
+        transparent
+      );
+  }
+
+  .offline p {
+    margin:
+      0.4rem
+      0
+      0;
+
+    font-family: var(--font-mono);
+
+    font-size: 0.72rem;
+
+    letter-spacing: 0.12em;
+
+    color:
+      var(--color-ink);
+  }
+
+  .offline-code,
+  .offline-detail {
+    font-family: var(--font-mono);
+
+    font-size: 0.52rem;
+
+    letter-spacing: 0.12em;
+
+    color:
+      var(--color-gold-deep);
+  }
+
+
+  /* ======================================================
+     MOBILE
+  ====================================================== */
+
+  @media (max-width: 52rem) {
+    .activity-head {
+      flex-direction: column;
+
+      align-items: flex-start;
+    }
+
+    .graph-shell {
+      padding:
+        1.4rem
+        1.1rem;
+    }
+
+    .graph {
+      min-width: max-content;
+    }
+
+    .graph-footer {
+      align-items: flex-start;
+
+      flex-direction: column;
+    }
+
+    .offline {
+      align-items: flex-start;
+
+      flex-direction: column;
+    }
+  }
+
+
+  /* ======================================================
+     REDUCED MOTION
+  ====================================================== */
+
+  @media (prefers-reduced-motion: reduce) {
+    .day,
+    .link-arrow {
+      transition: none;
+    }
+  }
+</style>

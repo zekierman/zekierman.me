@@ -22,6 +22,14 @@ Sampled from `assets/chasing-light-master.mp4` with ffmpeg. Region, frame, value
 | `--color-light-edge` | `#F4F2E9` | sky above the clouds |
 | `--color-ink` | `#14110D` | — text on light; warm black, never neutral |
 | `--color-ink-soft` | `#4A453D` | secondary text |
+| `--color-bench` | `#E2E0D7` | not sampled; `light-edge` carrying 8% ink |
+
+**The bench is the one derived colour.** The Lab is meant to read as a different
+room — a working surface rather than the page's paper — so it gets its own ground.
+The obvious choice for a laboratory surface is a cool grey, and that is exactly what
+put the Lab in a different building: everything else here is warm, and a green-grey
+beside it reads as a mistake rather than a decision. The bench is the page's own
+paper set down one stop, so the room changes without leaving the world.
 
 **The darkness is warm.** `#0F0A06` has more red than blue. An off-the-shelf
 blue-black (`#05060a`) put the page and the film in two different rooms — the seam
@@ -39,6 +47,12 @@ numbers, links, the active state. It never becomes a button fill or a gradient.
 |---|---|---|
 | Display / editorial | **Instrument Serif** 400 | statements, questions, pull quotes. Italic for the openings. |
 | Interface / structural | **Archivo** 300–400 | titles, labels, meta, body |
+| Measurement | **`--font-mono`**, the system stack | experiment numbers, coordinates, counts |
+
+The mono is the system's, not self-hosted, and that is deliberate: it carries about
+two dozen characters in the Lab, and a third downloaded face for that is a request
+spent badly. It lives as one token so the decision can be reversed in one line. It
+is for things that are *measured* — never as a costume for looking technical.
 
 Both are OFL, self-hosted and subset by Astro's fonts API — `latin` + `latin-ext`,
 because Turkish needs `ş ğ ı İ ö ü ç`. Only the sans is preloaded; the serif does
@@ -111,9 +125,17 @@ them, and the picture stutters.
 
 ## Language
 
-English at the root, Turkish under `/tr`. Copy is written natively in both, never
-translated line-for-line — same person, same voice, different language. It all
-lives in `src/content/copy.ts`, out of the components.
+Turkish at the root, English under `/en`; `/tr` redirects, because it was the
+Turkish URL before the two swapped. The site's own language is what the domain
+people type should open in. Copy is written natively in both, never translated
+line-for-line — same person, same voice, different language. It lives in
+`src/content/copy.ts`, out of the components.
+
+The name and the role are said twice on the page, so they are written once at the
+top of that file and spread into both places. They had already drifted apart once.
+
+The projects are not copy but data: one JSON file each under
+`src/content/projects/`, so the panel can add one without editing a module.
 
 `CHASING LIGHT` keeps its English name in both.
 
