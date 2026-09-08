@@ -35,7 +35,7 @@
     visibility: hidden;
   }
 
-  :global(html[data-cursor='on']) .cursor {
+  :global(html[data-pointer='on']) .cursor {
     visibility: visible;
     opacity: 1;
   }
@@ -43,9 +43,9 @@
   /* Only where the ring is genuinely drawn, and only on a fine pointer. Hiding
      the system cursor is not free — some people have chosen a large or
      high-contrast one deliberately — so it is hidden as narrowly as possible. */
-  :global(html[data-cursor='on']),
-  :global(html[data-cursor='on'] a),
-  :global(html[data-cursor='on'] button) {
+  :global(html[data-pointer='on']),
+  :global(html[data-pointer='on'] a),
+  :global(html[data-pointer='on'] button) {
     cursor: none;
   }
 
@@ -95,7 +95,7 @@
 
   /* Over a target the mark turns onto its diagonal and closes in: the same
      gesture a press makes when it locks registration. */
-  .cursor[data-showing]:not([data-hint]) .ring {
+  .cursor[data-showing] .ring {
     transform: rotate(45deg) scale(0.72);
   }
 
@@ -146,31 +146,24 @@
     let placed = false;
 
     /**
-     * What the thing under the pointer calls itself.
+     * What the thing under the pointer calls itself, or null over plain page.
      *
-     * `hint` is the difference between a word and a target: the hero says SCROLL,
-     * but it is not clickable, so the mark must not close in on it as though it
-     * were. Three people were shown the hero and none of them scrolled — the
-     * pointer carrying the word is one of the three places that now says so.
+     * Only ever asked about things that can actually be opened. The pointer
+     * naming something inert reads as a promise the page does not keep.
      */
-    function labelFor(element: Element | null): { text: string; hint: boolean } | null {
-      const declared = element?.closest('[data-cursor]');
-      if (declared) {
-        return {
-          text: declared.getAttribute('data-cursor') ?? '',
-          hint: declared.hasAttribute('data-cursor-hint'),
-        };
-      }
-
+    function labelFor(element: Element | null): string | null {
       const hit = element?.closest('a, button, [data-row], summary');
       if (!hit) return null;
 
-      if (hit.closest('[data-showcase]')) return { text: 'VIEW', hint: false };
-      if (hit.closest('#the-lab')) return { text: 'EXP', hint: false };
+      const declared = hit.getAttribute('data-cursor');
+      if (declared) return declared;
+
+      if (hit.closest('[data-showcase]')) return 'VIEW';
+      if (hit.closest('#the-lab')) return 'EXP';
 
       const href = hit.getAttribute('href') ?? '';
-      if (href.startsWith('mailto:')) return { text: 'MAIL', hint: false };
-      if (hit.getAttribute('target') === '_blank') return { text: 'OPEN', hint: false };
+      if (href.startsWith('mailto:')) return 'MAIL';
+      if (hit.getAttribute('target') === '_blank') return 'OPEN';
       return null;
     }
 
@@ -209,19 +202,16 @@
           placed = true;
           x = targetX;
           y = targetY;
-          document.documentElement.dataset.cursor = 'on';
+          document.documentElement.dataset.pointer = 'on';
         }
         start();
 
-        const found = labelFor(event.target as Element);
-        if (found?.text) {
+        const name = labelFor(event.target as Element);
+        if (name) {
           root.dataset.showing = '';
-          if (found.hint) root.dataset.hint = '';
-          else delete root.dataset.hint;
-          if (label.textContent !== found.text) label.textContent = found.text;
+          if (label.textContent !== name) label.textContent = name;
         } else {
           delete root.dataset.showing;
-          delete root.dataset.hint;
         }
       },
       { passive: true },
@@ -230,7 +220,7 @@
     // Off the window, out of the document, or into another tab: the ring should
     // not be left sitting somewhere the pointer is not.
     const hide = () => {
-      delete document.documentElement.dataset.cursor;
+      delete document.documentElement.dataset.pointer;
       placed = false;
     };
     document.addEventListener('pointerleave', hide);

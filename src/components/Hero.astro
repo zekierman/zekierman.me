@@ -11,7 +11,7 @@ const t = getCopy(locale).hero;
 {/* Three people were shown this and none of them scrolled. The film cannot start
     until they do, so the invitation has to be unmissable: a line of type, a bead
     falling down a rail, and the pointer itself carrying the word. */}
-<section class="hero" id="the-door" data-hero data-cursor={t.scrollLabel} data-cursor-hint>
+<section class="hero" id="the-door" data-hero>
   <div class="stage">
     <video
       class="film"
@@ -272,11 +272,11 @@ const t = getCopy(locale).hero;
     position: relative;
     display: block;
     width: 1px;
-    height: 2.6rem;
+    height: 4.6rem;
     overflow: hidden;
     background: linear-gradient(
       to bottom,
-      color-mix(in srgb, var(--color-light) 42%, transparent),
+      color-mix(in srgb, var(--color-light) 52%, transparent),
       transparent
     );
   }
@@ -285,13 +285,13 @@ const t = getCopy(locale).hero;
      earns it: it is not decoration, it is the instruction. */
   .hint-bead {
     position: absolute;
-    left: -1.5px;
-    width: 4px;
-    height: 4px;
+    left: -2.5px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
     background: var(--color-light);
-    box-shadow: 0 0 6px rgb(0 0 0 / 0.5);
-    animation: hint-fall 2.4s var(--ease-out) infinite;
+    box-shadow: 0 0 8px rgb(0 0 0 / 0.55);
+    animation: hint-fall 2.2s var(--ease-out) infinite;
   }
 
   @keyframes hint-fall {
@@ -306,7 +306,7 @@ const t = getCopy(locale).hero;
       opacity: 1;
     }
     100% {
-      top: 2.6rem;
+      top: 4.6rem;
       opacity: 0;
     }
   }
@@ -411,7 +411,7 @@ const t = getCopy(locale).hero;
       title!.style.opacity = String(1 - out);
       title!.style.transform = `translateY(${-out * 30}px)`;
       scrim!.style.opacity = String(1 - out);
-      hint!.style.opacity = String(Math.max(0, 0.85 * (1 - p / 0.14)));
+      hint!.style.opacity = String(Math.max(0, 1 - p / 0.035));
 
       let strongest = 0;
       for (const b of beats) {

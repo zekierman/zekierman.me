@@ -26,8 +26,6 @@ export const copy = {
       // the dark beside the doorway instead of across its light.
       title: ['Chasing', 'Light'],
       hint: 'Scroll to follow the light',
-      // One word, for the cursor. The sentence above is too long to sit on a pointer.
-      scrollLabel: 'SCROLL',
       // Lines that surface during the flight and are gone before the doorway.
       // `at` is scroll progress through the hero; they never overlap the title.
       beats: [
@@ -123,7 +121,6 @@ export const copy = {
       // The concept keeps its name in both languages.
       title: ['Chasing', 'Light'],
       hint: 'Işığı takip etmek için kaydır',
-      scrollLabel: 'KAYDIR',
       beats: [
         { at: 0.42, text: 'Bir şey ışığa doğru gidiyor.' },
         { at: 0.68, text: 'Ben de.' },
