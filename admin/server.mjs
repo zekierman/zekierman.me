@@ -267,7 +267,14 @@ async function publish(message) {
 const app = Fastify({ bodyLimit: 1024 * 1024, trustProxy: true });
 await app.register(cookie);
 await app.register(multipart, { limits: { fileSize: MAX_UPLOAD, files: 1 } });
-await app.register(fastifyStatic, { root: join(here, 'public'), prefix: '/' });
+// Served under /admin/, which is where the reverse proxy hands it over. Mounting
+// at / would work behind a proxy that strips the prefix, but then every path the
+// page asks for would have to be rewritten too — including /api. One prefix, both
+// sides agreeing on it, is fewer moving parts.
+await app.register(fastifyStatic, { root: join(here, 'public'), prefix: '/admin/' });
+
+// So that /admin lands somewhere rather than 404ing on a missing slash.
+app.get('/admin', async (_req, reply) => reply.redirect('/admin/', 308));
 
 app.addHook('onRequest', async (req, reply) => {
   if (req.url.startsWith('/api/') && req.url !== '/api/login') {
