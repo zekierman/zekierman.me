@@ -1,0 +1,9 @@
+# CI builds on Linux; a shell script checked out with CRLF fails there with a
+# confusing "bad interpreter" error. Normalise text, force LF where it matters.
+* text=auto eol=lf
+*.sh text eol=lf
+*.png binary
+*.jpg binary
+*.webp binary
+*.mp4 binary
+*.mkv binary

@@ -1,0 +1,54 @@
+---
+import { Font } from 'astro:assets';
+import { getCopy, type Locale } from '../content/copy';
+import '../styles/global.css';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getCopy(locale);
+
+const site = Astro.site ?? new URL('https://zekierman.me');
+const canonical = new URL(Astro.url.pathname, site);
+const enUrl = new URL('/', site);
+const trUrl = new URL('/tr/', site);
+const ogImage = new URL('/media/og.jpg', site);
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+    <title>{t.meta.title}</title>
+    <meta name="description" content={t.meta.description} />
+    <link rel="canonical" href={canonical} />
+
+    <link rel="alternate" hreflang="en" href={enUrl} />
+    <link rel="alternate" hreflang="tr" href={trUrl} />
+    <link rel="alternate" hreflang="x-default" href={enUrl} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content={locale === 'tr' ? 'tr_TR' : 'en_US'} />
+    <meta property="og:title" content={t.meta.title} />
+    <meta property="og:description" content={t.meta.description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <meta name="theme-color" content="#05060a" />
+
+    {/* Only the face the first screen actually paints is preloaded. The serif
+        does not appear until the light world, so it must not compete with the
+        poster image for the opening bandwidth. */}
+    <Font cssVariable="--font-sans" preload />
+    <Font cssVariable="--font-serif" />
+  </head>
+
+  <body>
+    <slot />
+  </body>
+</html>

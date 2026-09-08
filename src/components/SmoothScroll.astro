@@ -1,0 +1,14 @@
+<script>
+  import Lenis from 'lenis';
+
+  // Smooth scrolling is what makes the scrub read as a camera move rather than a
+  // slider. Skipped entirely when the visitor asked for less motion.
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const lenis = new Lenis({ lerp: 0.1 });
+    const raf = (time: number) => {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    };
+    requestAnimationFrame(raf);
+  }
+</script>

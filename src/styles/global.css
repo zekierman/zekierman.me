@@ -1,0 +1,57 @@
+@import 'tailwindcss';
+
+@theme {
+  /* Two worlds. The site travels from the first to the second. */
+  --color-dark: #05060a;
+  --color-dark-soft: #0d0f16;
+  --color-ink: #14110d;
+  --color-ink-soft: #4a453d;
+
+  /* The light world's palette, sampled from the frame the door opens onto. */
+  --color-light: #f6f1e8;
+  --color-light-warm: #fdf7ec;
+  --color-light-edge: #e6ded0;
+
+  --font-display: var(--font-serif);
+  --font-body: var(--font-sans);
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  /* Lenis drives the scroll; native smooth would fight it. */
+  scroll-behavior: auto;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-dark);
+  color: var(--color-light);
+  font-family: var(--font-body);
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* The hero is the only thing that should ever move the page horizontally: never. */
+body {
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--color-light);
+  color: var(--color-dark);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

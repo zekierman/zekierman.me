@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.astro/
+.DS_Store
+*.log
+
+# Master footage lives here and is far too large for git.
+# Web derivatives in public/media/ are generated from it by tools/encode.sh
+assets/
+
+# The hero film derivatives are generated and still churning. Keeping them out
+# while the film is being reworked stops every iteration from being baked into
+# git history. Track them once the film is final and CI needs them.
+public/media/*.mp4

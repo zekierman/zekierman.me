@@ -1,0 +1,91 @@
+---
+import { getCopy, type Locale } from '../content/copy';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = getCopy(locale).arrival;
+---
+
+<section class="arrival" id="arrival">
+  <p class="opening">
+    {t.opening.map((line) => <span class="line">{line}</span>)}
+  </p>
+
+  <p class="aside">{t.aside}</p>
+
+  <div class="who">
+    <p class="name">{t.name}</p>
+    <p class="role">{t.role}</p>
+  </div>
+
+  <p class="manifesto">
+    {t.manifesto.map((line) => <span class="line">{line}</span>)}
+  </p>
+</section>
+
+<style>
+  .arrival {
+    background: var(--color-light);
+    color: var(--color-ink);
+    padding: 26svh 6vw 30svh;
+  }
+
+  /* Line breaks are composed, not left to the viewport. Below the measure where
+     the intended breaks still read, fall back to normal wrapping. */
+  .line {
+    display: block;
+  }
+
+  @media (max-width: 30rem) {
+    .line {
+      display: inline;
+    }
+  }
+
+  .opening {
+    margin: 0;
+    max-width: 22ch;
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 6.2vw, 4.75rem);
+    line-height: 1.06;
+    letter-spacing: -0.015em;
+    font-style: italic;
+  }
+
+  .aside {
+    margin: 2.2rem 0 0;
+    max-width: 34ch;
+    font-size: clamp(1rem, 1.6vw, 1.2rem);
+    line-height: 1.5;
+    color: var(--color-ink-soft);
+  }
+
+  .who {
+    margin-top: 22svh;
+  }
+
+  .name {
+    margin: 0;
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+  }
+
+  .role {
+    margin: 0.6rem 0 0;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    color: var(--color-ink-soft);
+  }
+
+  .manifesto {
+    margin: 14svh 0 0;
+    max-width: 26ch;
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 4.2vw, 3.1rem);
+    line-height: 1.18;
+    letter-spacing: -0.01em;
+  }
+</style>
