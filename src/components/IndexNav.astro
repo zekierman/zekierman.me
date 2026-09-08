@@ -1,0 +1,235 @@
+---
+import { getCopy, type Locale } from '../content/copy';
+import { ui } from '../icons';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = getCopy(locale).index;
+---
+
+{/* The label is the accessible name, not the visible one: the word sat over the
+    film for the whole opening and read as a caption on the picture. */}
+<button
+  class="toggle"
+  type="button"
+  aria-haspopup="dialog"
+  aria-expanded="false"
+  aria-label={t.open}
+  data-index-open
+>
+  <svg viewBox="0 0 16 16" width="26" height="26" aria-hidden="true" focusable="false" set:html={ui.menu} />
+</button>
+
+{/* A real <dialog>: Escape, the focus trap and the inert page behind it are the
+    browser's job, and reimplementing them in script only gets them wrong. */}
+<dialog class="panel" aria-label={t.open} data-index-panel>
+  <div class="inner">
+    <button class="close" type="button" aria-label={t.close} data-index-close>
+      <svg viewBox="0 0 16 16" width="26" height="26" aria-hidden="true" focusable="false" set:html={ui.close} />
+    </button>
+
+    <nav>
+      <ol>
+        {
+          t.items.map((item, i) => (
+            <li style={`--i:${i}`}>
+              <a href={item.href} data-index-link>
+                <span class="n" aria-hidden="true">
+                  {item.n}
+                </span>
+                <span class="l">{item.label}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </nav>
+  </div>
+</dialog>
+
+<style>
+  /* Mirrors the language switch on the opposite corner, and blends the same way
+     so one control does not need a light and a dark version of itself. */
+  /* Open and close are the same control in two states, so they occupy exactly the
+     same point on the screen — the glyph swaps in place instead of jumping to the
+     other side of the gutter. Both are fixed and share this box; the close button
+     sits in the top layer with the dialog, which positions it against the viewport
+     the same way. An icon is a small target, and the box is what makes it a real
+     one at 48px. */
+  .toggle,
+  .close {
+    position: fixed;
+    top: 1.1rem;
+    left: max(0.85rem, env(safe-area-inset-left));
+    z-index: 40;
+    appearance: none;
+    background: none;
+    border: 0;
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  .toggle {
+    color: var(--color-light);
+    mix-blend-mode: difference;
+  }
+
+  .toggle svg,
+  .close svg {
+    display: block;
+    fill: currentColor;
+  }
+
+  .panel {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    max-height: none;
+    background: var(--color-void);
+    color: var(--color-light);
+  }
+
+  .panel::backdrop {
+    background: var(--color-void);
+  }
+
+  .inner {
+    height: 100%;
+    padding: 3.6rem max(6vw, 2.5rem) 6vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .close {
+    color: color-mix(in srgb, var(--color-light) 70%, transparent);
+    transition: color 0.3s var(--ease-out);
+  }
+
+  .close:hover,
+  .close:focus-visible {
+    color: var(--color-light);
+  }
+
+  nav {
+    margin: auto 0;
+  }
+
+  ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  li + li {
+    margin-top: clamp(0.6rem, 1.6vw, 1.1rem);
+  }
+
+  a {
+    display: flex;
+    align-items: baseline;
+    gap: clamp(1rem, 3vw, 2.4rem);
+    width: fit-content;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* Gold marks the things the light lands on. Here the numbering, as in the work. */
+  .n {
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    color: var(--color-gold-lift);
+  }
+
+  .l {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 6vw, 3.6rem);
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    color: color-mix(in srgb, var(--color-light) 76%, transparent);
+    transition: color 0.4s var(--ease-out);
+  }
+
+  a:hover .l,
+  a:focus-visible .l {
+    color: var(--color-light);
+  }
+
+  /* The one authored moment this control gets: the index lifts in the way the
+     beats do over the film, one line behind the last. */
+  .panel[open] li {
+    animation: lift 0.7s var(--ease-out) both;
+    animation-delay: calc(60ms * var(--i));
+  }
+
+  @keyframes lift {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .panel[open] li {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  import { smoothScroll } from '../scroll';
+
+  const openBtn = document.querySelector<HTMLButtonElement>('[data-index-open]');
+  const panel = document.querySelector<HTMLDialogElement>('[data-index-panel]');
+  const closeBtn = document.querySelector<HTMLButtonElement>('[data-index-close]');
+
+  if (openBtn && panel && closeBtn) {
+    openBtn.addEventListener('click', () => {
+      panel.showModal();
+      openBtn.setAttribute('aria-expanded', 'true');
+      // Lenis keeps scrolling the page under a modal otherwise.
+      smoothScroll()?.stop();
+    });
+
+    closeBtn.addEventListener('click', () => panel.close());
+
+    // Fires for the close button and for Escape alike, so the state lives here once.
+    panel.addEventListener('close', () => {
+      openBtn.setAttribute('aria-expanded', 'false');
+      smoothScroll()?.start();
+    });
+
+    for (const link of panel.querySelectorAll<HTMLAnchorElement>('[data-index-link]')) {
+      link.addEventListener('click', (event) => {
+        const target = document.querySelector<HTMLElement>(link.hash);
+        if (!target) return;
+        event.preventDefault();
+
+        // Scroll only once the panel has finished closing. Lenis.start() calls
+        // reset(), which stops whatever animation is running — so a scrollTo
+        // issued before the close event lands is cancelled a tick later by the
+        // restart, and the page never moves. The handler above is registered
+        // first, so it restarts Lenis before this one runs.
+        panel.addEventListener(
+          'close',
+          () => {
+            const lenis = smoothScroll();
+            if (lenis) lenis.scrollTo(target);
+            else target.scrollIntoView();
+          },
+          { once: true },
+        );
+        panel.close();
+      });
+    }
+  }
+</script>

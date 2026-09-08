@@ -10,7 +10,7 @@ export const copy = {
     meta: {
       title: 'Zeki Erman — Chasing Light',
       description:
-        'I build things because I want to know what happens if they exist. Computer engineering, creative development, and the things I chased.',
+        'Zeki Erman — 3rd-year computer engineering student at Necmettin Erbakan Üniversitesi. Builds web and mobile products: Pandoo, Novante Soft ERP, Erman Ofset.',
       langName: 'English',
     },
     hero: {
@@ -32,38 +32,12 @@ export const copy = {
       role: 'Computer Engineering · Creative Development',
       manifesto: ['I build things because I want to know', 'what happens if they exist.'],
     },
+    // The projects themselves are a content collection now, one file each, so the
+    // admin panel can add one without editing this module. Only the section's own
+    // words are left here.
     work: {
       label: 'Things I chased',
       lead: ['Some of it turned into products.', 'Some of it only taught me something.'],
-      projects: [
-        {
-          index: '01',
-          name: 'Pandoo',
-          meta: 'Mobile product · Konya · two of us on the software',
-          question: 'What does it take to put a loyalty card in someone’s pocket?',
-          note: 'Cafes still run on paper cards that end up lost at the bottom of a wallet. Pandoo replaces them: collect a stamp, fill the card, take the reward at the counter. It shipped on both stores — which turned out to be the hard part.',
-          image: '/media/work/pandoo.webp',
-          href: 'https://pandoo.novantesoft.com',
-        },
-        {
-          index: '02',
-          name: 'Novante Soft ERP',
-          meta: 'Platform · B2B · two of us on the software',
-          question: 'Can a whole business fit on one screen?',
-          note: 'Customers, quotes, invoices, VAT, stock that decrements itself the moment an invoice is issued, live central-bank rates. It starts as CRM and pre-accounting and grows with the company using it.',
-          image: '/media/work/novante.webp',
-          href: 'https://novantesoft.com',
-        },
-        {
-          index: '03',
-          name: 'Erman Ofset',
-          meta: 'Web · Konya · on my own',
-          question: 'What do thirty years of ink look like on a screen?',
-          note: 'My father’s press. Heidelberg and MAN Roland machines, ten million printed pages a year, and until recently no address on the internet. Building it meant first learning what the work actually is.',
-          image: '/media/work/ermanofset.webp',
-          href: 'https://ermanofset.com',
-        },
-      ],
     },
     lab: {
       label: 'The lab',
@@ -71,45 +45,49 @@ export const copy = {
       items: [
         {
           name: 'coffee-brew-tracker',
-          meta: 'TypeScript · mobile · open',
-          note: 'A tracker for coffee recipes and brew history. It came months before Pandoo. I didn’t know at the time that it was the beginning of something.',
+          meta: '[TypeScript] · mobile · open',
+          note: 'A mobile tracker for brew ratios, grind sizes, and pour history. Built purely out of curiosity months before Pandoo, long before I knew I would be building software for cafes.',
           href: 'https://github.com/zekierman/coffee-brew-tracker',
         },
         {
           name: 'akilli-galeri-sistemi',
-          meta: 'JavaScript · zero dependencies · open',
-          note: 'A gallery system for car dealerships, written without a single external package — partly because the job didn’t need them, partly to find out whether I could.',
+          meta: '[JavaScript] · zero dependencies · open',
+          note: 'A showcase system for auto dealerships, written without a single npm package or external library. Partly because the problem did not require one, partly to see how far vanilla JavaScript could carry it.',
           href: 'https://github.com/zekierman/akilli-galeri-sistemi',
         },
         {
           name: 'Client work',
-          meta: 'TypeScript · private',
-          note: 'Sites built for people who needed one. Closed repositories, but a good share of what I know came out of them.',
+          meta: '[TypeScript] · private',
+          note: 'Custom interfaces and web tools built for specific client needs. Closed repositories, but most of my production discipline and edge-case reflexes came out of those deadlines.',
           href: '',
         },
       ],
     },
     context: {
       label: 'A little context',
-      lines: ['I’m studying computer engineering.', 'But most of what I’ve learned didn’t start with a lecture.'],
+      lines: [
+        'Third-year computer engineering student at Necmettin Erbakan Üniversitesi.',
+        'Yet most of what I know never started in a lecture hall.',
+      ],
       pull: 'It started with: “Can I build this?”',
       body: [
-        'The answer was usually no, at first. Then it was almost. Then it was something that worked but only on my machine, and then something other people could open on their phone.',
-        'I like that distance. Most of what I can do now, I learned somewhere along it.',
+        'At first, the answer was almost always no. Then it became almost. Then something that worked only on my local machine, and eventually something people actually run on their phones.',
+        'I respect that distance. Most of what I can build today, I learned somewhere along that stretch.',
       ],
     },
-    currently: {
-      label: 'Currently',
-      rows: [
-        { k: 'Building', v: 'this site, and the next version of Pandoo' },
-        { k: 'Learning', v: 'how video behaves on the web when you take it apart' },
-        { k: 'Curious about', v: 'interfaces that feel like places rather than pages' },
+    // The page ends on the name and the ways to reach it. No closing line: the
+    // work has already made the case, and a sign-off after it only repeats.
+    profile: {
+      name: 'Zeki Erman',
+      role: 'Computer Engineering · Creative Development',
+      linksLabel: 'Elsewhere',
+      links: [
+        { label: 'GitHub', handle: 'zekierman', href: 'https://github.com/zekierman' },
+        { label: 'LinkedIn', handle: 'Zeki Erman', href: 'https://www.linkedin.com/in/zeki-erman-2197b3248/' },
+        { label: 'X', handle: '@zekierman01', href: 'https://x.com/zekierman01' },
+        { label: 'Instagram', handle: '@zekierman_', href: 'https://www.instagram.com/zekierman_/' },
+        { label: 'Email', handle: 'zekierman01@outlook.com', href: 'mailto:zekierman01@outlook.com' },
       ],
-    },
-    closing: {
-      title: 'Another door?',
-      line: 'If something here looks worth building, let’s build it.',
-      links: [{ label: 'GitHub', href: 'https://github.com/zekierman' }],
       sign: 'Zeki Erman © 2026',
       tail: 'Still chasing light.',
     },
@@ -121,7 +99,7 @@ export const copy = {
         { n: '02', label: 'Things I chased', href: '#things-i-chased' },
         { n: '03', label: 'The lab', href: '#the-lab' },
         { n: '04', label: 'Context', href: '#context' },
-        { n: '05', label: 'Another door', href: '#another-door' },
+        { n: '05', label: 'Elsewhere', href: '#another-door' },
       ],
     },
   },
@@ -130,7 +108,7 @@ export const copy = {
     meta: {
       title: 'Zeki Erman — Chasing Light',
       description:
-        'Aklıma takılan şeyleri sadece düşünmek yerine var etmeyi seviyorum. Bilgisayar mühendisliği, creative development ve peşinden gittiklerim.',
+        'Zeki Erman: Necmettin Erbakan Üniversitesi 3. sınıf bilgisayar mühendisliği öğrencisi. Web ve mobil ürünler üretiyor: Pandoo, Novante Soft ERP, Erman Ofset.',
       langName: 'Türkçe',
     },
     hero: {
@@ -152,35 +130,6 @@ export const copy = {
     work: {
       label: 'Peşinden gittiklerim',
       lead: ['Bazıları ürüne dönüştü.', 'Bazıları sadece bana bir şey öğretti.'],
-      projects: [
-        {
-          index: '01',
-          name: 'Pandoo',
-          meta: 'Mobil ürün · Konya · yazılımda iki kişiydik',
-          question: 'Bir sadakat kartı cebe nasıl girer?',
-          note: 'Kafeler hâlâ cüzdanın dibinde kaybolan karton kartlarla çalışıyor. Pandoo onların yerine geçiyor: damgayı topla, kart dolsun, ödülü kasadan al. İki mağazada da yayına girdi — asıl zor kısmı orasıymış.',
-          image: '/media/work/pandoo.webp',
-          href: 'https://pandoo.novantesoft.com',
-        },
-        {
-          index: '02',
-          name: 'Novante Soft ERP',
-          meta: 'Platform · B2B · yazılımda iki kişiydik',
-          question: 'Bir işletmenin tamamı tek ekrana sığar mı?',
-          note: 'Müşteriler, teklifler, faturalar, KDV, fatura kesilir kesilmez kendi kendine düşen stok, TCMB’den canlı kur. CRM ve ön muhasebeyle başlıyor, kullanan şirketle birlikte büyüyor.',
-          image: '/media/work/novante.webp',
-          href: 'https://novantesoft.com',
-        },
-        {
-          index: '03',
-          name: 'Erman Ofset',
-          meta: 'Web · Konya · tek başıma',
-          question: 'Otuz yıllık mürekkep ekranda nasıl görünür?',
-          note: 'Babamın matbaası. Heidelberg ve MAN Roland makineleri, yılda on milyon sayfa baskı, ve daha düne kadar internette hiçbir adres. Bunu yaparken asıl öğrendiğim şey işin kendisi oldu.',
-          image: '/media/work/ermanofset.webp',
-          href: 'https://ermanofset.com',
-        },
-      ],
     },
     lab: {
       label: 'Lab',
@@ -188,45 +137,47 @@ export const copy = {
       items: [
         {
           name: 'coffee-brew-tracker',
-          meta: 'TypeScript · mobil · açık',
-          note: 'Kahve reçetelerini ve demleme geçmişini tutan bir uygulama. Pandoo’dan aylar önce yazıldı. O sırada bir şeyin başlangıcı olduğunu bilmiyordum.',
+          meta: '[TypeScript] · mobil · açık',
+          note: 'Filtre kahve reçetelerini, su-kahve oranlarını ve demleme sürelerini kaydeden mobil uygulama. Pandoo’dan aylar önce meraktan yazdım; sonradan kahve sektörüne gireceğimi o zaman bilmiyordum.',
           href: 'https://github.com/zekierman/coffee-brew-tracker',
         },
         {
           name: 'akilli-galeri-sistemi',
-          meta: 'JavaScript · sıfır bağımlılık · açık',
-          note: 'Oto galeriler için bir galeri sistemi, tek bir harici paket kullanmadan. Kısmen iş gerektirmediği için, kısmen yapabilir miyim diye.',
+          meta: '[JavaScript] · sıfır bağımlılık · açık',
+          note: 'Oto galeriler için tek bir harici kütüphane veya npm paketi kullanmadan yazılmış vitrin sistemi. Kısmen iş fazlasını istemediği için, kısmen de sıfırdan saf JavaScript ile neler yapılabileceğini görmek için.',
           href: 'https://github.com/zekierman/akilli-galeri-sistemi',
         },
         {
           name: 'Müşteri işleri',
-          meta: 'TypeScript · kapalı',
-          note: 'İhtiyacı olan insanlar için yapılmış siteler. Depoları kapalı, ama bildiklerimin epey bir kısmı onların içinden çıktı.',
+          meta: '[TypeScript] · kapalı',
+          note: 'Farklı sektörlerdeki işletmeler için hazırladığım özel web arayüzleri ve yönetim araçları. Kodları kapalı, ama bugün bildiğim pratik reflekslerin çoğu o teslim tarihlerinde oturdu.',
           href: '',
         },
       ],
     },
     context: {
       label: 'Biraz bağlam',
-      lines: ['Bilgisayar mühendisliği okuyorum.', 'Ama öğrendiklerimin çoğu bir derste başlamadı.'],
+      lines: [
+        'Necmettin Erbakan Üniversitesi’nde 3. sınıf bilgisayar mühendisliği öğrencisiyim.',
+        'Ama öğrendiklerimin çoğu amfilerde başlamadı.',
+      ],
       pull: 'Şununla başladı: “Bunu yapabilir miyim?”',
       body: [
-        'Cevap genelde önce hayırdı. Sonra neredeyse oldu. Sonra çalışan ama sadece benim bilgisayarımda çalışan bir şey, sonra başkalarının telefonunda açabildiği bir şey.',
-        'Aradaki o mesafeyi seviyorum. Bugün yapabildiğim şeylerin çoğunu o mesafede öğrendim.',
+        'Cevap önce genelde hayırdı. Sonra neredeyse oldu. Sonra sadece kendi makinemde derlenen bir şey, en sonunda da başka insanların cebinde çalışan bir uygulama.',
+        'Fikirle çalışan kod arasındaki o mesafeyi seviyorum. Bugün bildiklerimin çoğunu o yolda yürürken öğrendim.',
       ],
     },
-    currently: {
-      label: 'Şu sıralar',
-      rows: [
-        { k: 'Yapıyorum', v: 'bu siteyi, ve Pandoo’nun bir sonraki sürümünü' },
-        { k: 'Öğreniyorum', v: 'videoyu parçalarına ayırınca web’de nasıl davrandığını' },
-        { k: 'Merak ediyorum', v: 'sayfadan çok mekân gibi duran arayüzleri' },
+    profile: {
+      name: 'Zeki Erman',
+      role: 'Bilgisayar Mühendisliği · Creative Development',
+      linksLabel: 'Başka yerlerde',
+      links: [
+        { label: 'GitHub', handle: 'zekierman', href: 'https://github.com/zekierman' },
+        { label: 'LinkedIn', handle: 'Zeki Erman', href: 'https://www.linkedin.com/in/zeki-erman-2197b3248/' },
+        { label: 'X', handle: '@zekierman01', href: 'https://x.com/zekierman01' },
+        { label: 'Instagram', handle: '@zekierman_', href: 'https://www.instagram.com/zekierman_/' },
+        { label: 'E-posta', handle: 'zekierman01@outlook.com', href: 'mailto:zekierman01@outlook.com' },
       ],
-    },
-    closing: {
-      title: 'Başka bir kapı?',
-      line: 'Burada yapmaya değer bir şey gördüysen, yapalım.',
-      links: [{ label: 'GitHub', href: 'https://github.com/zekierman' }],
       sign: 'Zeki Erman © 2026',
       tail: 'Hâlâ ışığın peşinde.',
     },
@@ -238,7 +189,7 @@ export const copy = {
         { n: '02', label: 'Peşinden gittiklerim', href: '#things-i-chased' },
         { n: '03', label: 'Lab', href: '#the-lab' },
         { n: '04', label: 'Bağlam', href: '#context' },
-        { n: '05', label: 'Başka bir kapı', href: '#another-door' },
+        { n: '05', label: 'Bağlantılar', href: '#another-door' },
       ],
     },
   },
@@ -252,5 +203,18 @@ export function getCopy(locale: Locale): Copy {
 
 /** Path to the same page in the other language. */
 export function altPath(locale: Locale): string {
-  return locale === 'en' ? '/tr/' : '/';
+  return locale === 'tr' ? '/en/' : '/';
+}
+
+/**
+ * Splits a meta line on `[…]` marks. Parts inside the brackets must keep English
+ * casing: `.meta` is uppercased in CSS, and under `lang="tr"` that turns
+ * "TypeScript" into "TYPESCRİPT". The surrounding Turkish words need the Turkish
+ * rules, so the split has to happen in the markup, not around the whole line.
+ */
+export function metaParts(meta: string): { text: string; en: boolean }[] {
+  return meta
+    .split(/\[(.+?)\]/g)
+    .map((text, i) => ({ text, en: i % 2 === 1 }))
+    .filter((part) => part.text !== '');
 }

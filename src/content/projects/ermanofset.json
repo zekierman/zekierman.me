@@ -1,0 +1,17 @@
+{
+  "order": 3,
+  "href": "https://ermanofset.com",
+  "image": "/media/work/ermanofset.webp",
+  "en": {
+    "name": "Erman Ofset",
+    "meta": "Web · Konya · on my own",
+    "question": "What do thirty years of ink look like on a screen?",
+    "note": "My father’s commercial press. Heidelberg and MAN Roland machines running ten million printed sheets a year, and until recently not a single address on the internet. Building their web presence meant first understanding paper weights, machine rhythm, and what the trade actually is."
+  },
+  "tr": {
+    "name": "Erman Ofset",
+    "meta": "Web · Konya · tek başıma",
+    "question": "Otuz yıllık mürekkep ekranda nasıl durur?",
+    "note": "Babamın matbaası. Heidelberg ve MAN Roland makineleri, yılda on milyon basılı sayfa ve düne kadar internette tek bir adresi olmayan bir atölye. Web sitesini tasarlamadan önce matbaanın gürültüsünü, kağıdın gramajını ve yapılan işin kendisini anlamam gerekti."
+  }
+}

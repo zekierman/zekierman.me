@@ -30,7 +30,12 @@ const t = getCopy(locale).hero;
     {/* The doorway is the brightest thing in frame and the title sits beside it.
         This deepens only the left edge — enough to hold type at full contrast
         without putting a box around it. */}
-    <div class="scrim" aria-hidden="true"></div>
+    <div class="scrim" data-hero-scrim aria-hidden="true"></div>
+
+    {/* The film has to end IN the page, not on it. This melts the bottom of the
+        stage into the light world's own colour over the last screen, so the
+        handoff is a dissolve rather than a cut with the film sitting on top. */}
+    <div class="dissolve" data-hero-dissolve aria-hidden="true"></div>
 
     {/* The concept keeps its English name in both languages, so it must also keep
         English casing: under lang="tr", text-transform: uppercase turns "Light"
@@ -104,15 +109,34 @@ const t = getCopy(locale).hero;
     );
   }
 
+  /* Deepens the left edge so the title holds contrast against the starfield.
+     It exists for the title, so it leaves with the title — held past that it
+     just darkens half of a bright frame for no reason. */
   .scrim {
     position: absolute;
     inset: 0;
     pointer-events: none;
+    will-change: opacity;
     background: linear-gradient(
       100deg,
       color-mix(in srgb, var(--color-void) 82%, transparent) 0%,
       color-mix(in srgb, var(--color-void) 55%, transparent) 26%,
       transparent 52%
+    );
+  }
+
+  .dissolve {
+    position: absolute;
+    inset: auto 0 0;
+    height: 64%;
+    opacity: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      color-mix(in srgb, var(--color-light) 30%, transparent) 42%,
+      color-mix(in srgb, var(--color-light) 82%, transparent) 78%,
+      var(--color-light) 100%
     );
   }
 
@@ -248,6 +272,8 @@ const t = getCopy(locale).hero;
   const video = document.querySelector<HTMLVideoElement>('[data-hero-video]');
   const hold = document.querySelector<HTMLElement>('[data-hero-hold]');
   const bleach = document.querySelector<HTMLElement>('[data-hero-bleach]');
+  const scrim = document.querySelector<HTMLElement>('[data-hero-scrim]');
+  const dissolve = document.querySelector<HTMLElement>('[data-hero-dissolve]');
   const title = document.querySelector<HTMLElement>('[data-hero-title]');
   const hint = document.querySelector<HTMLElement>('[data-hero-hint]');
   const beatScrim = document.querySelector<HTMLElement>('[data-beat-scrim]');
@@ -258,7 +284,7 @@ const t = getCopy(locale).hero;
 
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  if (hero && video && hold && bleach && title && hint && !reduced) {
+  if (hero && video && hold && bleach && scrim && dissolve && title && hint && !reduced) {
     // Pick one file and only one. Serving <source> alternates would let some
     // browsers pull both.
     const small = matchMedia('(max-width: 820px)').matches;
@@ -322,6 +348,7 @@ const t = getCopy(locale).hero;
       const out = Math.min(1, p / 0.26);
       title!.style.opacity = String(1 - out);
       title!.style.transform = `translateY(${-out * 30}px)`;
+      scrim!.style.opacity = String(1 - out);
       hint!.style.opacity = String(Math.max(0, 0.8 * (1 - p / 0.09)));
 
       let strongest = 0;
@@ -333,6 +360,9 @@ const t = getCopy(locale).hero;
       }
       if (beatScrim) beatScrim.style.opacity = String(strongest);
 
+      // Starts well before the hold frame: by the time the section boundary is on
+      // screen the film must already be reading as the page underneath it.
+      dissolve!.style.opacity = String(clamp01((p - 0.86) / 0.14));
       hold!.style.opacity = String(clamp01((p - 0.94) / 0.06));
       bleach!.style.opacity = String(clamp01((p - 0.985) / 0.015) * 0.55);
 

@@ -1,0 +1,112 @@
+---
+import { getCopy, type Locale } from '../content/copy';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = getCopy(locale).context;
+---
+
+<section class="context" id="context">
+  <header class="head" data-reveal>
+    <h2 class="label">{t.label}</h2>
+    <p class="lead">{t.lines.map((line) => <span>{line}</span>)}</p>
+  </header>
+
+  {/* The question the whole site is an answer to, so it is set as the loudest
+      thing in the section and given the gold rule the doorway light draws. */}
+  <blockquote class="pull" data-reveal>
+    <p>{t.pull}</p>
+  </blockquote>
+
+  <div class="body" data-reveal>
+    {t.body.map((p) => <p>{p}</p>)}
+  </div>
+</section>
+
+<style>
+  .context {
+    background: var(--color-light);
+    color: var(--color-ink);
+    padding: 0 6vw 24svh;
+  }
+
+  /* The section's name, and its heading. It is set small because the statement
+     under it is the loud part, but it is what names this section in the outline
+     a reader — or a crawler — walks. */
+  .label {
+    margin: 0 0 2.4rem;
+    font-weight: 400;
+    font-size: 0.625rem;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    color: var(--color-gold-deep);
+  }
+
+  .lead {
+    margin: 0;
+    max-width: 26ch;
+    font-family: var(--font-display);
+    font-size: clamp(1.7rem, 4.2vw, 3.2rem);
+    line-height: 1.15;
+    letter-spacing: -0.012em;
+  }
+
+  .lead span {
+    display: block;
+  }
+
+  .pull {
+    margin: 16svh 0 0;
+    max-width: 20ch;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: clamp(1.9rem, 5.2vw, 3.8rem);
+    line-height: 1.14;
+    letter-spacing: -0.018em;
+  }
+
+  .pull p {
+    margin: 0;
+  }
+
+  /* The same short gold rule that opens the hero title and the name block. */
+  .pull::before {
+    content: '';
+    display: block;
+    width: clamp(2.2rem, 5vw, 4.5rem);
+    height: 1px;
+    margin-bottom: clamp(1.4rem, 2.6vw, 2.4rem);
+    background: var(--color-gold);
+  }
+
+  .body {
+    margin: 8svh 0 0;
+    max-width: 46ch;
+  }
+
+  .body p {
+    margin: 0;
+    font-size: clamp(0.95rem, 1.25vw, 1.05rem);
+    line-height: 1.65;
+    color: var(--color-ink-soft);
+  }
+
+  .body p + p {
+    margin-top: 1.6rem;
+  }
+
+  /* Wide: the quote steps into the right half and the prose follows it, so the
+     section reads as a diagonal down the page rather than a stack of blocks. */
+  @media (min-width: 60rem) {
+    .pull,
+    .body {
+      margin-left: 34%;
+    }
+
+    .pull {
+      margin-top: 12svh;
+    }
+  }
+</style>

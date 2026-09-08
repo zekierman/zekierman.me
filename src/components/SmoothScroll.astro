@@ -1,14 +1,28 @@
 <script>
-  import Lenis from 'lenis';
+  import { reducedMotion, startSmoothScroll } from '../scroll';
 
-  // Smooth scrolling is what makes the scrub read as a camera move rather than a
-  // slider. Skipped entirely when the visitor asked for less motion.
-  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    const lenis = new Lenis({ lerp: 0.1 });
-    const raf = (time: number) => {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    };
-    requestAnimationFrame(raf);
+  startSmoothScroll();
+
+  const reduced = reducedMotion();
+
+  // One observer for every `data-reveal` on the page. Per-component observers
+  // would each pick up all the others' elements, and one `unobserve` would not
+  // stop the rest.
+  const items = document.querySelectorAll<HTMLElement>('[data-reveal]');
+
+  if (items.length && !reduced) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          entry.target.classList.add('is-in');
+          io.unobserve(entry.target); // reveal once; re-animating on the way back up reads as a glitch
+        }
+      },
+      { rootMargin: '0px 0px -12% 0px' },
+    );
+    items.forEach((el) => io.observe(el));
+  } else {
+    items.forEach((el) => el.classList.add('is-in'));
   }
 </script>

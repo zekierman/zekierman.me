@@ -3,14 +3,27 @@ import Base from '../layouts/Base.astro';
 import Hero from '../components/Hero.astro';
 import Arrival from '../components/Arrival.astro';
 import Work from '../components/Work.astro';
+import Lab from '../components/Lab.astro';
+import Context from '../components/Context.astro';
+import Profile from '../components/Profile.astro';
+import IndexNav from '../components/IndexNav.astro';
 import LangSwitch from '../components/LangSwitch.astro';
 import SmoothScroll from '../components/SmoothScroll.astro';
 ---
 
-<Base locale="en">
-  <LangSwitch locale="en" />
-  <Hero locale="en" />
-  <Arrival locale="en" />
-  <Work locale="en" />
+<Base locale="tr">
+  <IndexNav locale="tr" />
+  <LangSwitch locale="tr" />
+  {/* The index and the language switch are navigation, so they stay outside the
+      main landmark; everything a reader came for is inside it. */}
+  <main>
+    <Hero locale="tr" />
+    <Arrival locale="tr" />
+    <Work locale="tr" />
+    <Lab locale="tr" />
+    <Context locale="tr" />
+  </main>
+
+  <Profile locale="tr" />
   <SmoothScroll />
 </Base>

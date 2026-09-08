@@ -17,8 +17,14 @@ cd "$(dirname "$0")/.."
 
 SRC="assets/chasing-light-master.mp4"
 STILL="assets/start-frame-v3.png"
+LOGO="assets/brand-kit/logo.svg"
 OUT="public/media"
 mkdir -p "$OUT"
+
+# The logo master is a PNG inside an SVG wrapper. Unwrap it to a temp file so
+# ffmpeg can read it; the wrapper itself is never touched.
+LOGO_PNG="$(mktemp -u).png"
+node -e "const fs=require('fs');const m=fs.readFileSync(process.argv[1],'utf8').match(/base64,([A-Za-z0-9+\/=]+)/);fs.writeFileSync(process.argv[2],Buffer.from(m[1],'base64'))" "$LOGO" "$LOGO_PNG"
 
 # g=6 / bf=0 is the whole point: the master carries ONE keyframe for the entire
 # clip, so every scrub seek would decode from frame 0. Short GOP, no B-frames.
@@ -47,5 +53,64 @@ ffmpeg -y -v error -sseof -0.05 -i "$SRC" -vframes 1 -vf "scale=1920:-1:flags=la
 
 echo "→ social card"
 ffmpeg -y -v error -i "$STILL" -vf "scale=1200:630:force_original_aspect_ratio=increase,crop=1200:630" -q:v 4 "$OUT/og.jpg"
+
+# ---------------------------------------------------------------------------
+# Brand mark
+#
+# assets/brand-kit/logo.svg is not vector art — it is a 2048px PNG in an SVG
+# wrapper, so it is treated as a bitmap master like everything else here. The
+# mark is a halftone seagull above the wordmark on a solid #fbfcfc ground with no
+# alpha channel. The crop is measured off the master and takes the bird only; the
+# wordmark is deliberately left behind, because Archivo already sets the name on
+# the page and a picture of type would be the one blurry word on the site.
+#
+# White is keyed into a real alpha channel rather than composited away: the mark
+# sits on the void in the closing and on a void ground in the icon, and a baked
+# background would show its own edge on both. The ramp starts at 248, not 255, so
+# the master's off-white ground lands at zero alpha instead of a faint haze.
+BIRD="crop=1196:1080:476:260"
+ALPHA="a='clip((248-r(X,Y))*255/240,0,255)'"
+
+echo "→ brand mark (bird only, keyed to alpha, in the light world's cream)"
+mkdir -p "$OUT/brand"
+ffmpeg -y -v error -i "$LOGO_PNG" \
+  -vf "$BIRD,scale=720:-1:flags=lanczos,format=rgba,geq=r='254':g='243':b='227':$ALPHA" \
+  "$OUT/brand/mark-light.png"
+
+echo "→ favicon / touch icon"
+# One file at 512, not a ladder of sizes. Downscaling is exactly what makes a
+# halftone readable small — the dots average back into a silhouette — so the
+# browser is left to do it rather than baking a hand-tuned 16px version.
+ffmpeg -y -v error -i "$LOGO_PNG" -f lavfi -i "color=c=0x0F0A06:s=512x512" \
+  -filter_complex "[0:v]$BIRD,scale=384:-1:flags=lanczos,format=rgba,geq=r='254':g='238':b='195':$ALPHA[mark];[1:v][mark]overlay=(W-w)/2:(H-h)/2,format=rgb24" \
+  -frames:v 1 public/icon.png
+
+rm -f "$LOGO_PNG"
+
+# ---------------------------------------------------------------------------
+# Work shots
+#
+# Scaled to a common width and never cropped. Cropping these to one aspect ratio
+# cost Erman Ofset the top of its own header — a screenshot is a record of a
+# page, and trimming it to fit a box edits the record. The showcase sizes its
+# frame to each picture instead, so the shots may differ in height.
+echo "→ work shots"
+mkdir -p "$OUT/work"
+manifest=""
+for master in assets/work/*; do
+  [ -e "$master" ] || continue
+  name="$(basename "${master%.*}")"
+  out="$OUT/work/$name.webp"
+  ffmpeg -y -v error -i "$master" -vf "scale=1400:-2:flags=lanczos" -q:v 82 "$out"
+  dims="$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=p=0 "$out")"
+  manifest="$manifest{\"name\":\"$name\",\"w\":${dims%,*},\"h\":${dims#*,}},"
+done
+
+# Because the shots are no longer one shape, the page cannot assume one. This is
+# how it learns each picture's size without shipping a probe to the browser: the
+# showcase reserves the right box, so nothing jumps as the images arrive.
+printf '[%s]
+' "${manifest%,}" > src/content/work-shots.json
+echo "  wrote src/content/work-shots.json"
 
 ls -la "$OUT"

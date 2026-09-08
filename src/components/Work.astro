@@ -1,58 +1,119 @@
 ---
+import { getCollection } from 'astro:content';
 import { getCopy, type Locale } from '../content/copy';
+import shots from '../content/work-shots.json';
 
 interface Props {
   locale: Locale;
 }
 const { locale } = Astro.props;
 const t = getCopy(locale).work;
+
+// The size comes from the generated manifest rather than a hard-coded pair: the
+// shots are not cropped to one shape, so each one carries its own.
+const sized = new Map((shots as { name: string; w: number; h: number }[]).map((s) => [s.name, s]));
+
+const entries = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+
+const projects = entries.map((entry, i) => {
+  const p = entry.data;
+  const key = p.image.replace(/^.*\/|\.webp$/g, '');
+  const shot = sized.get(key) ?? { w: 1400, h: 664 };
+  return {
+    ...p[locale],
+    href: p.href,
+    image: p.image,
+    // Numbered by position, so adding a project renumbers the rest instead of
+    // leaving someone to retype three labels by hand.
+    index: String(i + 1).padStart(2, '0'),
+    // The address is the proof, and it is already here as the link target.
+    host: new URL(p.href).host.replace(/^www\./, ''),
+    w: shot.w,
+    h: shot.h,
+  };
+});
 ---
 
 <section class="work" id="things-i-chased">
-  <header class="head">
-    <p class="label">{t.label}</p>
+  <header class="head" data-reveal>
+    <h2 class="label">{t.label}</h2>
     <p class="lead">{t.lead.map((line) => <span>{line}</span>)}</p>
   </header>
 
-  {
-    t.projects.map((p, i) => (
-      <article class="project" data-reveal data-side={i % 2 === 0 ? 'right' : 'left'}>
-        <div class="text">
+  <div class="list" data-showcase>
+    {/* The screenshot rides the cursor instead of sitting in the column. Three
+        inline images were what made this section sprawl: each one left a hole
+        under the shorter of the two columns, so the projects read as things
+        dropped onto the page. Here the eye stays on the names and the picture
+        comes to it. Pointer devices only — the rows carry their own image
+        below, which is what coarse pointers and reduced motion get. */}
+    <div class="preview" data-preview aria-hidden="true">
+      {
+        projects.map((p) => (
+          <img
+            class="frame"
+            data-frame
+            data-ar={`${p.w} / ${p.h}`}
+            src={p.image}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            width={p.w}
+            height={p.h}
+          />
+        ))
+      }
+    </div>
+
+    {
+      projects.map((p) => (
+        <a class="row" data-reveal data-row href={p.href} target="_blank" rel="noopener noreferrer">
           <p class="index" aria-hidden="true">
             {p.index}
           </p>
-          <h3 class="name">
-            <a href={p.href} target="_blank" rel="noopener noreferrer">
-              {p.name}
-            </a>
-          </h3>
-          <p class="meta">{p.meta}</p>
-          <p class="question">{p.question}</p>
-          <p class="note">{p.note}</p>
-        </div>
 
-        <figure class="shot">
-          <img src={p.image} alt={p.name} loading="lazy" decoding="async" width="1400" height="664" />
-        </figure>
-      </article>
-    ))
-  }
+          <div class="lead-col">
+            <h3 class="name">
+              <span class="name-text">{p.name}</span>
+              <span class="arrow" aria-hidden="true">
+                ↗
+              </span>
+            </h3>
+            <p class="meta">{p.meta}</p>
+            <p class="question">{p.question}</p>
+          </div>
+
+          <div class="tail-col">
+            <p class="note">{p.note}</p>
+            <p class="host">{p.host}</p>
+          </div>
+
+          <figure class="shot">
+            <img src={p.image} alt={p.name} loading="lazy" decoding="async" width={p.w} height={p.h} />
+          </figure>
+        </a>
+      ))
+    }
+  </div>
 </section>
 
 <style>
   .work {
     background: var(--color-light);
     color: var(--color-ink);
-    padding: 0 0 28svh;
-    overflow-x: clip;
+    padding: 0 max(6vw, 2.5rem) 24svh;
   }
 
   .head {
-    padding: 0 6vw 14svh;
+    padding-bottom: 12svh;
   }
 
+  /* The section's name, and its heading. It is set small because the statement
+     under it is the loud part, but it is what names this section in the outline
+     a reader — or a crawler — walks. */
   .label {
     margin: 0 0 2.4rem;
+    font-weight: 400;
     font-size: 0.625rem;
     letter-spacing: 0.34em;
     text-transform: uppercase;
@@ -72,21 +133,44 @@ const t = getCopy(locale).work;
     display: block;
   }
 
-  .project {
-    display: grid;
-    gap: clamp(2.5rem, 5vw, 4.5rem);
-    align-items: center;
-    padding: 0 0 18svh;
+  .list {
+    position: relative;
+    border-top: 1px solid color-mix(in srgb, var(--color-ink) 14%, transparent);
   }
 
-  .text {
-    padding: 0 6vw;
-    max-width: 62ch;
+  /* ---------- rows ---------- */
+
+  .row {
+    position: relative;
+    display: block;
+    padding: clamp(2.4rem, 4.5vw, 3.6rem) 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 14%, transparent);
+    color: inherit;
+    text-decoration: none;
   }
 
-  /* Gold marks the things the doorway light lands on. Here: the numbering. */
+  /* The wash bleeds past the gutter so the row reads as a band across the page
+     rather than a box drawn around the text. */
+  .row::before {
+    content: '';
+    position: absolute;
+    inset: 0 calc(-1 * max(6vw, 2.5rem));
+    background: color-mix(in srgb, var(--color-ink) 4%, transparent);
+    opacity: 0;
+    transition: opacity 0.4s var(--ease-out);
+  }
+
+  .row:hover::before,
+  .row:focus-visible::before {
+    opacity: 1;
+  }
+
+  .row > * {
+    position: relative;
+  }
+
   .index {
-    margin: 0 0 1.4rem;
+    margin: 0 0 1rem;
     font-size: 0.7rem;
     letter-spacing: 0.3em;
     color: var(--color-gold-deep);
@@ -94,31 +178,48 @@ const t = getCopy(locale).work;
 
   .name {
     margin: 0;
-    font-size: clamp(2.1rem, 6.4vw, 4.6rem);
+    display: flex;
+    align-items: baseline;
+    gap: 0.35em;
+    font-size: clamp(1.9rem, 5vw, 3.4rem);
     font-weight: 400;
-    line-height: 1;
+    line-height: 1.05;
     letter-spacing: -0.03em;
   }
 
-  .name a {
-    color: inherit;
-    text-decoration: none;
-    /* The underline is drawn, not borrowed, so it can sit off the baseline and
-       animate without shifting the line box. */
+  /* Drawn, not borrowed: it sits off the baseline and grows without moving the
+     line box. Same underline the lab and the profile use. */
+  .name-text {
     background-image: linear-gradient(currentColor, currentColor);
     background-size: 0% 1px;
-    background-position: 0 96%;
+    background-position: 0 100%;
     background-repeat: no-repeat;
-    transition: background-size 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: background-size 0.5s var(--ease-out);
   }
 
-  .name a:hover,
-  .name a:focus-visible {
+  .row:hover .name-text,
+  .row:focus-visible .name-text {
     background-size: 100% 1px;
   }
 
+  .arrow {
+    font-size: 0.42em;
+    color: var(--color-gold-deep);
+    opacity: 0;
+    transform: translate(-0.4em, 0.4em);
+    transition:
+      opacity 0.4s var(--ease-out),
+      transform 0.4s var(--ease-out);
+  }
+
+  .row:hover .arrow,
+  .row:focus-visible .arrow {
+    opacity: 1;
+    transform: none;
+  }
+
   .meta {
-    margin: 1.5rem 0 0;
+    margin: 1.2rem 0 0;
     font-size: 0.7rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
@@ -126,27 +227,37 @@ const t = getCopy(locale).work;
   }
 
   .question {
-    margin: 3.4rem 0 0;
+    margin: 2rem 0 0;
     max-width: 20ch;
     font-family: var(--font-display);
     font-style: italic;
-    font-size: clamp(1.35rem, 3.1vw, 2.3rem);
+    font-size: clamp(1.25rem, 2.6vw, 1.9rem);
     line-height: 1.25;
   }
 
   .note {
-    margin: 2rem 0 0;
-    max-width: 44ch;
+    margin: 0;
+    max-width: 46ch;
     font-size: clamp(0.95rem, 1.25vw, 1.05rem);
     line-height: 1.65;
     color: var(--color-ink-soft);
   }
 
-  /* The image bleeds off one edge, alternating down the page. A grid of equal
-     cards would turn three different kinds of work into one shape. */
+  .host {
+    margin: 1.6rem 0 0;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    color: var(--color-gold-deep);
+  }
+
+  /* ---------- the row's own image ---------- */
+
   .shot {
-    margin: 0;
+    margin: 2.4rem 0 0;
     overflow: hidden;
+    border-radius: 2px;
+    background: color-mix(in srgb, var(--color-ink) 5%, var(--color-light));
+    border: 1px solid color-mix(in srgb, var(--color-ink) 12%, transparent);
   }
 
   .shot img {
@@ -155,72 +266,173 @@ const t = getCopy(locale).work;
     height: auto;
   }
 
-  @media (min-width: 60rem) {
-    .project {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
-    }
+  /* ---------- the cursor preview ---------- */
 
-    .project[data-side='right'] .text {
-      grid-column: 1;
-      padding-left: 6vw;
-      padding-right: 0;
-    }
-    .project[data-side='right'] .shot {
-      grid-column: 2;
-      margin-right: calc(-1 * var(--bleed, 4vw));
-      border-radius: 2px 0 0 2px;
-    }
-
-    .project[data-side='left'] .text {
-      grid-column: 2;
-      padding-right: 6vw;
-      padding-left: 0;
-    }
-    .project[data-side='left'] .shot {
-      grid-column: 1;
-      grid-row: 1;
-      margin-left: calc(-1 * var(--bleed, 4vw));
-      border-radius: 0 2px 2px 0;
-    }
-  }
-
-  [data-reveal] {
+  .preview {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 2;
+    width: clamp(20rem, 32vw, 36rem);
+    /* Set from the active picture, because they are no longer one shape. */
+    aspect-ratio: var(--ar, 1400 / 664);
+    pointer-events: none;
     opacity: 0;
-    transform: translateY(28px);
+    scale: 0.94;
+    border-radius: 2px;
+    overflow: hidden;
+    background: color-mix(in srgb, var(--color-ink) 5%, var(--color-light));
+    border: 1px solid color-mix(in srgb, var(--color-ink) 14%, transparent);
+    /* Offset and blur, so it reads as something held above the page rather than
+       a coloured halo sitting behind it. */
+    box-shadow: 0 18px 44px -14px color-mix(in srgb, var(--color-ink) 42%, transparent);
     transition:
-      opacity 1s cubic-bezier(0.16, 1, 0.3, 1),
-      transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+      opacity 0.4s var(--ease-out),
+      scale 0.4s var(--ease-out),
+      aspect-ratio 0.4s var(--ease-out);
+    display: none;
   }
 
-  [data-reveal].is-in {
+  .preview.is-on {
     opacity: 1;
-    transform: none;
+    scale: 1;
+  }
+
+  .frame {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    scale: 1.06;
+    filter: blur(8px);
+    transition:
+      opacity 0.5s var(--ease-out),
+      scale 0.5s var(--ease-out),
+      filter 0.5s var(--ease-out);
+  }
+
+  .frame.is-on {
+    opacity: 1;
+    scale: 1;
+    filter: none;
+  }
+
+  /* ---------- wide ---------- */
+
+  @media (min-width: 60rem) {
+    .row {
+      display: grid;
+      grid-template-columns: 4rem minmax(0, 1fr) minmax(0, 1fr);
+      column-gap: clamp(2rem, 4vw, 5rem);
+      align-items: start;
+    }
+
+    .index {
+      margin: 0.7rem 0 0;
+    }
+
+    /* The picture follows the cursor here, so the inline one would be the same
+       image twice. */
+    .shot {
+      display: none;
+    }
+  }
+
+  /* Only a fine pointer that can hover gets the preview at all. */
+  @media (min-width: 60rem) and (hover: hover) and (pointer: fine) {
+    .preview {
+      display: block;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    [data-reveal] {
+    .preview {
+      display: none;
+    }
+    .shot {
+      display: block;
+    }
+    .arrow {
       opacity: 1;
       transform: none;
-      transition: none;
     }
   }
 </style>
 
 <script>
-  const items = document.querySelectorAll<HTMLElement>('[data-reveal]');
-  if (items.length && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (!entry.isIntersecting) continue;
-          entry.target.classList.add('is-in');
-          io.unobserve(entry.target); // reveal once; re-animating on the way back up reads as a glitch
-        }
-      },
-      { rootMargin: '0px 0px -12% 0px' },
-    );
-    items.forEach((el) => io.observe(el));
-  } else {
-    items.forEach((el) => el.classList.add('is-in'));
+  const list = document.querySelector<HTMLElement>('[data-showcase]');
+  const preview = document.querySelector<HTMLElement>('[data-preview]');
+  const frames = [...document.querySelectorAll<HTMLElement>('[data-frame]')];
+  const rows = [...document.querySelectorAll<HTMLElement>('[data-row]')];
+
+  const wanted = matchMedia('(min-width: 60rem) and (hover: hover) and (pointer: fine)');
+  const calm = matchMedia('(prefers-reduced-motion: reduce)');
+
+  if (list && preview && frames.length && wanted.matches && !calm.matches) {
+    let targetX = 0;
+    let targetY = 0;
+    let x = 0;
+    let y = 0;
+    let running = false;
+    let seeded = false;
+
+    // Eased toward the pointer rather than pinned to it. Pinned, the picture is
+    // part of the cursor; trailing, it reads as something being carried.
+    const tick = () => {
+      x += (targetX - x) * 0.14;
+      y += (targetY - y) * 0.14;
+      preview.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+
+      if (Math.abs(targetX - x) < 0.1 && Math.abs(targetY - y) < 0.1) {
+        running = false;
+        return;
+      }
+      requestAnimationFrame(tick);
+    };
+
+    const start = () => {
+      if (running) return;
+      running = true;
+      requestAnimationFrame(tick);
+    };
+
+    list.addEventListener('pointermove', (event) => {
+      const box = list.getBoundingClientRect();
+      targetX = event.clientX - box.left + 28;
+      targetY = event.clientY - box.top - preview.offsetHeight / 2;
+
+      // The first move inside the list places it outright; easing in from 0,0
+      // would fly the picture across the whole section.
+      if (!seeded) {
+        seeded = true;
+        x = targetX;
+        y = targetY;
+      }
+      start();
+    });
+
+    rows.forEach((row, i) => {
+      const show = () => {
+        preview.classList.add('is-on');
+        // The frame takes the shape of the picture rather than cropping it to fit.
+        const ar = frames[i]?.dataset.ar;
+        if (ar) preview.style.setProperty('--ar', ar);
+        frames.forEach((f, j) => f.classList.toggle('is-on', i === j));
+      };
+      row.addEventListener('pointerenter', show);
+      // Keyboard gets the same picture; it just does not get to move it.
+      row.addEventListener('focus', show);
+    });
+
+    const hide = () => {
+      preview.classList.remove('is-on');
+      frames.forEach((f) => f.classList.remove('is-on'));
+    };
+    list.addEventListener('pointerleave', hide);
+    list.addEventListener('focusout', (event) => {
+      if (!list.contains(event.relatedTarget as Node)) hide();
+    });
   }
 </script>

@@ -1,0 +1,17 @@
+{
+  "order": 2,
+  "href": "https://novantesoft.com",
+  "image": "/media/work/novante.webp",
+  "en": {
+    "name": "Novante Soft ERP",
+    "meta": "Platform · B2B · two of us on the software",
+    "question": "Can a company’s entire day fit into a single workflow?",
+    "note": "Quotes, invoices, VAT, stock that decrements the second an invoice is issued, live central-bank exchange rates. A multi-tenant platform designed to replace scattered spreadsheets with software that handles operations in one clean system."
+  },
+  "tr": {
+    "name": "Novante Soft ERP",
+    "meta": "Platform · B2B · yazılımda iki kişiydik",
+    "question": "Bir işletmenin bütün günü tek ekrana sığar mı?",
+    "note": "Teklifler, faturalar, KDV hesapları, fatura kesildiği anda eksilen stok ve TCMB’den anlık kurlar. Dağınık tabloları ve ön muhasebeyi tek akışta toplamak için baştan sona geliştirdiğimiz çok kiracılı bir işletme platformu."
+  }
+}

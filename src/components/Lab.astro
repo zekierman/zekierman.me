@@ -1,5 +1,5 @@
 ---
-import { getCopy, type Locale } from '../content/copy';
+import { getCopy, metaParts, type Locale } from '../content/copy';
 
 interface Props {
   locale: Locale;
@@ -10,7 +10,7 @@ const t = getCopy(locale).lab;
 
 <section class="lab" id="the-lab">
   <header class="head" data-reveal>
-    <p class="label">{t.label}</p>
+    <h2 class="label">{t.label}</h2>
     <p class="lead">{t.lead.map((line) => <span>{line}</span>)}</p>
   </header>
 
@@ -18,7 +18,7 @@ const t = getCopy(locale).lab;
     {
       t.items.map((item) => (
         <li class="item" data-reveal>
-          <div class="name">
+          <h3 class="name">
             {item.href ? (
               <a href={item.href} target="_blank" rel="noopener noreferrer">
                 {item.name}
@@ -29,8 +29,8 @@ const t = getCopy(locale).lab;
             ) : (
               <span>{item.name}</span>
             )}
-          </div>
-          <p class="meta">{item.meta}</p>
+          </h3>
+          <p class="meta">{metaParts(item.meta).map((part) => (part.en ? <span lang="en">{part.text}</span> : part.text))}</p>
           <p class="note">{item.note}</p>
         </li>
       ))
@@ -51,8 +51,12 @@ const t = getCopy(locale).lab;
     padding-bottom: 12svh;
   }
 
+  /* The section's name, and its heading. It is set small because the statement
+     under it is the loud part, but it is what names this section in the outline
+     a reader — or a crawler — walks. */
   .label {
     margin: 0 0 2.4rem;
+    font-weight: 400;
     font-size: 0.625rem;
     letter-spacing: 0.34em;
     text-transform: uppercase;
@@ -99,6 +103,8 @@ const t = getCopy(locale).lab;
   }
 
   .name {
+    margin: 0;
+    font-weight: 400;
     font-size: clamp(1.15rem, 2.4vw, 1.75rem);
     line-height: 1.2;
     letter-spacing: -0.01em;

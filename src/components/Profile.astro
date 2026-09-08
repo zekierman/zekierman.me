@@ -1,0 +1,321 @@
+---
+import { getCopy, type Locale } from '../content/copy';
+import { getLinkIcon } from '../icons';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getCopy(locale).profile;
+---
+
+{/* The film went dark → threshold → light. The page closes the same arc in
+    reverse, so "another door" is somewhere the visitor actually is. */}
+<div class="threshold" aria-hidden="true"></div>
+
+<footer class="profile" id="another-door">
+  <div class="inner">
+    <div class="composed" data-reveal>
+      {/* Identity block */}
+      <div class="identity">
+        <img
+          class="mark"
+          src="/media/brand/mark-light.png"
+          alt=""
+          aria-hidden="true"
+          width="720"
+          height="650"
+          loading="lazy"
+          decoding="async"
+        />
+        <h2 class="name">{t.name}</h2>
+        <p class="role">{t.role}</p>
+      </div>
+
+      {/* Links block */}
+      <div class="links-section">
+        <p class="label">{t.linksLabel}</p>
+        <ul class="links">
+          {
+            t.links.map((link) => {
+              const isMail = link.href.startsWith('mailto:');
+              const iconMarkup = getLinkIcon(link.label, link.href);
+              return (
+                <li class="link-item">
+                  <a
+                    href={link.href}
+                    target={isMail ? undefined : '_blank'}
+                    rel={isMail ? undefined : 'noopener noreferrer'}
+                    class="link-row"
+                  >
+                    <span class="link-main">
+                      <span class="icon" aria-hidden="true">
+                        <svg
+                          viewBox="0 0 16 16"
+                          width="16"
+                          height="16"
+                          aria-hidden="true"
+                          focusable="false"
+                          set:html={iconMarkup}
+                        />
+                      </span>
+                      <span class="link-text">
+                        <span class="link-label">{link.label}</span>
+                        <span class="link-handle">{link.handle}</span>
+                      </span>
+                    </span>
+                    <span class="arrow" aria-hidden="true">
+                      ↗
+                    </span>
+                  </a>
+                </li>
+              );
+            })
+          }
+        </ul>
+      </div>
+    </div>
+
+    {/* Footer row: hairline rule, sign on left, tail on right */}
+    <div class="sign">
+      <p class="who">{t.sign}</p>
+      <p class="tail">{t.tail}</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  /* Not a cut. The light drains through the gold it was made of — the same ramp
+     the doorway ran, played backwards — so the dark is arrived at, not switched to. */
+  .threshold {
+    height: clamp(9rem, 20svh, 15rem);
+    background: linear-gradient(
+      to bottom,
+      var(--color-light-edge) 0%,
+      var(--color-light-edge) 46%,
+      color-mix(in srgb, var(--color-gold-deep) 62%, var(--color-void)) 80%,
+      var(--color-void) 100%
+    );
+  }
+
+  .profile {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background: var(--color-void);
+    color: var(--color-light);
+    padding: 16svh max(6vw, 2.5rem) 8svh;
+  }
+
+  /* Two radial ramps of gold light landing across the dark ground, cancelling
+     quantisation banding in 8-bit. */
+  .profile::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(
+        34% 27% at 19% 31%,
+        color-mix(in srgb, var(--color-gold) 20%, transparent) 0%,
+        transparent 78%
+      ),
+      radial-gradient(
+        52% 44% at 25% 36%,
+        color-mix(in srgb, var(--color-gold) 12%, transparent) 0%,
+        transparent 72%
+      );
+  }
+
+  .inner {
+    width: 100%;
+  }
+
+  /* Side by side from min-width: 52rem, stacked below that */
+  .composed {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(4.5rem, 9svh, 7rem);
+  }
+
+  @media (min-width: 52rem) {
+    .composed {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+      column-gap: clamp(3.5rem, 6vw, 7.5rem);
+      align-items: start;
+    }
+  }
+
+  /* Identity */
+  .mark {
+    display: block;
+    width: clamp(3.6rem, 7vw, 5.5rem);
+    height: auto;
+    margin: 0 0 clamp(2rem, 3.5vw, 3rem);
+    opacity: 0.88;
+  }
+
+  .name {
+    margin: 0;
+    font-size: clamp(2.2rem, 5.2vw, 3.8rem);
+    font-weight: 400;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    color: var(--color-light);
+  }
+
+  .role {
+    margin: clamp(1rem, 2svh, 1.6rem) 0 0;
+    /* Wide enough to hold the whole line: at 34ch it broke between "Creative"
+       and "Development", which reads as two roles rather than one. */
+    max-width: 46ch;
+    text-wrap: balance;
+    font-size: clamp(0.95rem, 1.4vw, 1.15rem);
+    line-height: 1.5;
+    letter-spacing: 0.01em;
+    color: color-mix(in srgb, var(--color-light) 68%, transparent);
+  }
+
+  /* Links section */
+  .label {
+    margin: 0 0 1.2rem;
+    font-size: 0.625rem;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    color: var(--color-gold-lift);
+  }
+
+  .links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid color-mix(in srgb, var(--color-light) 14%, transparent);
+  }
+
+  .link-item {
+    border-bottom: 1px solid color-mix(in srgb, var(--color-light) 14%, transparent);
+  }
+
+  .link-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.2rem;
+    min-height: 44px;
+    padding: clamp(0.85rem, 1.8svh, 1.2rem) 0;
+    text-decoration: none;
+    color: var(--color-light);
+  }
+
+  .link-main {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-width: 0;
+  }
+
+  .icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    color: color-mix(in srgb, var(--color-light) 55%, transparent);
+    transition: color 0.35s var(--ease-out);
+  }
+
+  .icon :global(svg) {
+    display: block;
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+  }
+
+  .link-row:hover .icon,
+  .link-row:focus-visible .icon {
+    color: var(--color-gold-lift);
+  }
+
+  .link-text {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.4rem 1.1rem;
+    min-width: 0;
+  }
+
+  .link-label {
+    font-size: clamp(0.95rem, 1.3vw, 1.1rem);
+    font-weight: 400;
+    color: var(--color-light);
+    /* Drawn underline idiom */
+    background-image: linear-gradient(var(--color-gold-lift), var(--color-gold-lift));
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition:
+      background-size 0.5s var(--ease-out),
+      color 0.3s var(--ease-out);
+  }
+
+  .link-row:hover .link-label,
+  .link-row:focus-visible .link-label {
+    color: var(--color-gold-lift);
+    background-size: 100% 1px;
+  }
+
+  .link-handle {
+    font-size: clamp(0.82rem, 1vw, 0.92rem);
+    color: color-mix(in srgb, var(--color-light) 52%, transparent);
+    transition: color 0.3s var(--ease-out);
+  }
+
+  .link-row:hover .link-handle {
+    color: color-mix(in srgb, var(--color-light) 75%, transparent);
+  }
+
+  .arrow {
+    display: inline-block;
+    font-size: 0.85em;
+    color: var(--color-gold-lift);
+    flex-shrink: 0;
+    transition: transform 0.4s var(--ease-out);
+  }
+
+  .link-row:hover .arrow,
+  .link-row:focus-visible .arrow {
+    transform: translate(2px, -2px);
+  }
+
+  /* Footer row */
+  .sign {
+    position: relative;
+    margin-top: clamp(8rem, 16svh, 14rem);
+    padding-top: 2rem;
+    border-top: 1px solid color-mix(in srgb, var(--color-light) 14%, transparent);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1.2rem 2rem;
+  }
+
+  .who {
+    margin: 0;
+    font-size: 0.7rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--color-light) 60%, transparent);
+  }
+
+  .tail {
+    margin: 0;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: clamp(1rem, 1.6vw, 1.25rem);
+    color: var(--color-gold-lift);
+  }
+</style>

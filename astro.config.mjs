@@ -6,13 +6,17 @@ import sitemap from '@astrojs/sitemap';
 export default defineConfig({
   site: 'https://zekierman.me',
 
-  // English lives at the root, Turkish under /tr. The apex keeps its link equity
-  // and shared URLs stay clean, with no redirect hop on the domain people type.
+  // Turkish lives at the root, English under /en. The site's own language is what
+  // the domain people type should open in, and the apex keeps its link equity.
   i18n: {
-    locales: ['en', 'tr'],
-    defaultLocale: 'en',
+    locales: ['tr', 'en'],
+    defaultLocale: 'tr',
     routing: { prefixDefaultLocale: false },
   },
+
+  // /tr/ was the Turkish URL before the languages swapped. Anything already
+  // shared under it still has to land somewhere.
+  redirects: { '/tr/': '/' },
 
   // Astro self-hosts, subsets and preloads these. No third-party font request,
   // no separate font pipeline to maintain.
@@ -35,7 +39,7 @@ export default defineConfig({
     },
   ],
 
-  integrations: [sitemap({ i18n: { defaultLocale: 'en', locales: { en: 'en', tr: 'tr' } } })],
+  integrations: [sitemap({ i18n: { defaultLocale: 'tr', locales: { tr: 'tr', en: 'en' } } })],
 
   vite: { plugins: [tailwind()] },
 });

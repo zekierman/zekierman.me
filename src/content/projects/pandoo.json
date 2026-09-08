@@ -1,0 +1,17 @@
+{
+  "order": 1,
+  "href": "https://pandoo.novantesoft.com",
+  "image": "/media/work/pandoo.webp",
+  "en": {
+    "name": "Pandoo",
+    "meta": "Mobile product · Konya · two of us on the software",
+    "question": "What does it take to put a loyalty card inside a phone?",
+    "note": "Cafes still run on paper stamp cards that get lost at the bottom of a wallet. Pandoo moves them to mobile: rotating QR codes, digital stamps, a free coffee at the counter. Writing the app was the straightforward part; getting it through both App Store and Play Store review was the real education."
+  },
+  "tr": {
+    "name": "Pandoo",
+    "meta": "Mobil ürün · Konya · yazılımda iki kişiydik",
+    "question": "Karton bir sadakat kartı cebe nasıl girer?",
+    "note": "Kafeler hâlâ cüzdanın dibinde kaybolan karton pullarla çalışıyor. Pandoo onu telefona taşıdı: 30 saniyede bir dönen QR kod, toplanan damgalar, kasadan alınan kahve. Uygulamayı yazmak birkaç ay sürdü; App Store ve Play Store onaylarından geçirmek asıl iş oldu."
+  }
+}
