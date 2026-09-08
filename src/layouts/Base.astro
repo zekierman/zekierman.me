@@ -85,6 +85,13 @@ const jsonLd = {
 
     <meta name="theme-color" content="#0f0a06" />
 
+    {/* Search Console ownership. Kept in the layout rather than as a file in
+        public/: the token is meant to stay in place for as long as the property
+        exists, and a line here cannot be lost to a tidy-up of static files. It
+        is not a secret — it only proves this site and that account are the same
+        person. */}
+    <meta name="google-site-verification" content="EhXRvTXmTv6POu0c_29Sf25MxbRL8LCt7xfxlTRrwG4" />
+
     {/* One icon, not a ladder of sizes. Downscaling is what makes the halftone
         mark readable small — the dots average back into a silhouette — so the
         browser is left to do it. */}
