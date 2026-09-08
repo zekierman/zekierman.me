@@ -251,7 +251,7 @@
           await api('/login', {
             method: 'POST',
             headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({ password: $('pw').value }),
+            body: JSON.stringify({ password: $('pw').value.trim() }),
           });
           $('pw').value = '';
           say('');

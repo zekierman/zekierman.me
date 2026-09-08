@@ -291,7 +291,11 @@ app.addHook('onRequest', async (req, reply) => {
 app.post('/api/login', async (req, reply) => {
   const ip = req.ip;
   if (throttled(ip)) return reply.code(429).send({ error: 'too many attempts, wait 15 minutes' });
-  const password = typeof req.body?.password === 'string' ? req.body.password : '';
+  // Trimmed, and the same trim is applied when the password is set. A password
+  // pasted from a note or a manager routinely carries a trailing space or
+  // newline; the terminal that set it dropped that and the browser that sends it
+  // keeps it, and the two then never match while both look identical on screen.
+  const password = typeof req.body?.password === 'string' ? req.body.password.trim() : '';
   if (!password || !(await passwordMatches(password))) {
     noteFailure(ip);
     return reply.code(401).send({ error: 'wrong password' });
