@@ -286,6 +286,35 @@ birkaç saniye sonra ana sayfada görünmeli.
 
 ---
 
+## 12 — GitHub katkı grafiği
+
+Lab'daki katkı grafiği canlı çekilmiyor. `tools/fetch-github.mjs` veriyi
+`src/content/github-activity.json` dosyasına yazıyor, sayfa yalnızca o dosyayı
+okuyor. Böylece derleme ağa hiç çıkmıyor (14,5 sn → 2,3 sn), token bir bileşene
+hiç yaklaşmıyor, ve GitHub çökse bile son geçerli grafik sayfada duruyor.
+
+Token sunucunun ortam değişkeninde durur, panelde değil:
+
+```bash
+sudo -iu zeki bash -c 'umask 077; printf "GITHUB_TOKEN=%s
+" "TOKENI_BURAYA_YAZ" > ~/site/.env'
+```
+
+> Bu komutu **sen** çalıştır ve token'ı kendin yaz. `.env` git'e girmez.
+
+Günde bir kez yenilesin (gece 03:00). Veri değişmediyse commit de atmaz:
+
+```bash
+sudo -iu zeki crontab -e
+```
+
+```cron
+0 3 * * * cd $HOME/site && set -a && . ./.env && set +a && node tools/fetch-github.mjs >> $HOME/github.log 2>&1 && git diff --quiet src/content/github-activity.json || (git add src/content/github-activity.json && git commit -q -m "Refresh the contribution calendar" && npm run build)
+```
+
+Betik ağa çıkamazsa dosyaya dokunmaz ve `0` ile çıkar — yani başarısız bir gece
+sessizce geçer, site kırılmaz.
+
 ## Günlük işler
 
 ```bash
