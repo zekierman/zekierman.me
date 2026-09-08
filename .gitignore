@@ -12,3 +12,7 @@ assets/
 # while the film is being reworked stops every iteration from being baked into
 # git history. Track them once the film is final and CI needs them.
 public/media/*.mp4
+
+# The panel keeps its password hash and session secret here. Never commit it.
+admin/.credentials.json
+admin/node_modules/

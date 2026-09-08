@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Panel — zekierman.me</title>
+    <style>
+      /* The panel borrows the site's palette so it feels like the same place,
+         but it is a tool, not the page: denser, plainer, no film. */
+      :root {
+        color-scheme: dark;
+        --void: #0f0a06;
+        --lift: #171505;
+        --gold: #c9a44b;
+        --gold-deep: #6e5518;
+        --light: #faf3e3;
+        --line: color-mix(in srgb, var(--light) 16%, transparent);
+        --soft: color-mix(in srgb, var(--light) 62%, transparent);
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--void);
+        color: var(--light);
+        font: 400 15px/1.5 ui-sans-serif, system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      .wrap { max-width: 54rem; margin: 0 auto; padding: 2rem 1.25rem 6rem; }
+      h1 { margin: 0 0 2rem; font-size: 1rem; letter-spacing: 0.24em; text-transform: uppercase; color: var(--gold); font-weight: 400; }
+      h2 { margin: 2.5rem 0 1rem; font-size: 0.7rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); font-weight: 400; }
+      label { display: block; margin: 0 0 0.4rem; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--soft); }
+      input, textarea, button {
+        font: inherit; width: 100%; padding: 0.7rem 0.8rem; border-radius: 3px;
+        background: var(--lift); color: var(--light); border: 1px solid var(--line);
+      }
+      textarea { min-height: 6.5rem; resize: vertical; }
+      input:focus-visible, textarea:focus-visible, button:focus-visible { outline: 1px solid var(--gold); outline-offset: 2px; }
+      .field { margin-bottom: 1rem; }
+      .row { display: grid; gap: 1rem; }
+      @media (min-width: 44rem) { .row { grid-template-columns: 1fr 1fr; } }
+      button {
+        width: auto; cursor: pointer; padding: 0.7rem 1.4rem; letter-spacing: 0.12em;
+        text-transform: uppercase; font-size: 0.75rem; background: var(--gold-deep);
+        border-color: transparent; color: var(--light);
+      }
+      button:disabled { opacity: 0.5; cursor: progress; }
+      button.ghost { background: none; border-color: var(--line); color: var(--soft); }
+      button.danger { background: none; border-color: transparent; color: var(--soft); padding: 0.4rem 0; }
+      button.danger:hover { color: #d98b7a; }
+      .note { color: var(--soft); font-size: 0.85rem; margin: 0.4rem 0 0; }
+      .msg { margin: 1rem 0; padding: 0.8rem 1rem; border-radius: 3px; border: 1px solid var(--line); }
+      .msg.bad { border-color: #7a3a2c; color: #e5a595; }
+      .msg.good { border-color: var(--gold-deep); color: var(--gold); }
+      .item { display: flex; gap: 1rem; align-items: center; padding: 0.9rem 0; border-bottom: 1px solid var(--line); }
+      .item img { width: 92px; height: auto; border-radius: 2px; border: 1px solid var(--line); }
+      .item b { font-weight: 400; }
+      .item .grow { flex: 1; min-width: 0; }
+      .item small { color: var(--soft); display: block; }
+      [hidden] { display: none !important; }
+      fieldset { border: 1px solid var(--line); border-radius: 3px; padding: 1.2rem; margin: 0 0 1.5rem; }
+      legend { padding: 0 0.5rem; font-size: 0.7rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>zekierman.me</h1>
+      <div id="msg" class="msg" hidden></div>
+
+      <!-- sign in -->
+      <section id="gate" hidden>
+        <div class="field">
+          <label for="pw">Parola</label>
+          <input id="pw" type="password" autocomplete="current-password" />
+        </div>
+        <button id="signin">Gir</button>
+      </section>
+
+      <!-- the panel -->
+      <section id="panel" hidden>
+        <h2>Projeler</h2>
+        <div id="list"></div>
+
+        <h2 id="formTitle">Yeni proje</h2>
+        <form id="form">
+          <div class="row">
+            <div class="field">
+              <label for="slug">Kısa ad (dosya adı)</label>
+              <input id="slug" required pattern="[a-z0-9][a-z0-9-]*" />
+              <p class="note">Küçük harf, rakam ve tire. Görselin adı da bu olur.</p>
+            </div>
+            <div class="field">
+              <label for="order">Sıra</label>
+              <input id="order" type="number" min="1" max="99" value="1" required />
+              <p class="note">01 / 02 / 03 numaraları buradan türetilir.</p>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="href">Adres</label>
+            <input id="href" type="url" placeholder="https://..." required />
+          </div>
+
+          <div class="field">
+            <label for="image">Ekran görüntüsü</label>
+            <input id="image" type="file" accept="image/*" />
+            <p class="note">1400 piksel genişliğe küçültülür, kırpılmaz. Düzenlerken boş bırakırsan mevcut görsel kalır.</p>
+          </div>
+
+          <fieldset>
+            <legend>Türkçe</legend>
+            <div class="field"><label for="tr_name">Ad</label><input id="tr_name" required /></div>
+            <div class="field"><label for="tr_meta">Künye</label><input id="tr_meta" placeholder="Mobil ürün · Konya · yazılımda iki kişiydik" required /></div>
+            <div class="field"><label for="tr_question">Soru</label><input id="tr_question" required /></div>
+            <div class="field"><label for="tr_note">Açıklama</label><textarea id="tr_note" required></textarea></div>
+          </fieldset>
+
+          <fieldset>
+            <legend>English</legend>
+            <div class="field"><label for="en_name">Name</label><input id="en_name" required /></div>
+            <div class="field"><label for="en_meta">Meta</label><input id="en_meta" required /></div>
+            <div class="field"><label for="en_question">Question</label><input id="en_question" required /></div>
+            <div class="field"><label for="en_note">Note</label><textarea id="en_note" required></textarea></div>
+          </fieldset>
+
+          <button id="save" type="submit">Kaydet ve yayına al</button>
+          <button id="reset" type="button" class="ghost" hidden>Vazgeç</button>
+          <p class="note">Kaydedince site yeniden derlenir. Birkaç saniye sürer.</p>
+        </form>
+
+        <h2>Oturum</h2>
+        <button id="signout" class="ghost">Çıkış</button>
+      </section>
+    </div>
+
+    <script>
+      const $ = (id) => document.getElementById(id);
+      const msg = $('msg');
+      let editing = null;
+
+      function say(text, good = false) {
+        msg.textContent = text;
+        msg.className = 'msg ' + (good ? 'good' : 'bad');
+        msg.hidden = !text;
+      }
+
+      // Every mutating call carries this header. A form posted from another site
+      // cannot set it, which is the second lock behind the strict-same-site cookie.
+      async function api(path, options = {}) {
+        const res = await fetch('/api' + path, {
+          ...options,
+          headers: { 'x-panel': '1', ...(options.headers || {}) },
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || 'bir şeyler ters gitti');
+        return data;
+      }
+
+      function show(signedIn) {
+        $('gate').hidden = signedIn;
+        $('panel').hidden = !signedIn;
+        if (signedIn) load();
+      }
+
+      async function load() {
+        const { projects } = await api('/projects');
+        $('list').innerHTML = '';
+        for (const p of projects) {
+          const row = document.createElement('div');
+          row.className = 'item';
+          row.innerHTML =
+            '<img alt="" src="' + p.image + '?v=' + Date.now() + '">' +
+            '<div class="grow"><b></b><small></small></div>';
+          row.querySelector('b').textContent = p.order + ' · ' + p.tr.name;
+          row.querySelector('small').textContent = p.href;
+
+          const edit = document.createElement('button');
+          edit.className = 'ghost';
+          edit.textContent = 'Düzenle';
+          edit.onclick = () => fill(p);
+
+          const del = document.createElement('button');
+          del.className = 'danger';
+          del.textContent = 'Sil';
+          del.onclick = async () => {
+            if (!confirm(p.tr.name + ' silinsin mi? Görseli de gider.')) return;
+            del.disabled = true;
+            try {
+              await api('/projects/' + p.slug, { method: 'DELETE' });
+              say('Silindi ve yayına alındı.', true);
+              load();
+            } catch (e) {
+              say(e.message);
+              del.disabled = false;
+            }
+          };
+
+          row.append(edit, del);
+          $('list').append(row);
+        }
+      }
+
+      function fill(p) {
+        editing = p.slug;
+        $('formTitle').textContent = 'Düzenle: ' + p.tr.name;
+        $('slug').value = p.slug;
+        $('slug').readOnly = true;
+        $('order').value = p.order;
+        $('href').value = p.href;
+        for (const l of ['tr', 'en'])
+          for (const f of ['name', 'meta', 'question', 'note']) $(l + '_' + f).value = p[l][f];
+        $('reset').hidden = false;
+        scrollTo({ top: $('form').offsetTop - 40, behavior: 'smooth' });
+      }
+
+      $('reset').onclick = () => {
+        editing = null;
+        $('form').reset();
+        $('slug').readOnly = false;
+        $('formTitle').textContent = 'Yeni proje';
+        $('reset').hidden = true;
+      };
+
+      $('signin').onclick = async () => {
+        try {
+          await api('/login', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ password: $('pw').value }),
+          });
+          $('pw').value = '';
+          say('');
+          show(true);
+        } catch (e) {
+          say(e.message);
+        }
+      };
+      $('pw').onkeydown = (e) => e.key === 'Enter' && $('signin').click();
+
+      $('signout').onclick = async () => {
+        await api('/logout', { method: 'POST' });
+        show(false);
+      };
+
+      $('form').onsubmit = async (e) => {
+        e.preventDefault();
+        const doc = {
+          slug: $('slug').value.trim(),
+          order: Number($('order').value),
+          href: $('href').value.trim(),
+          tr: {}, en: {},
+        };
+        for (const l of ['tr', 'en'])
+          for (const f of ['name', 'meta', 'question', 'note']) doc[l][f] = $(l + '_' + f).value.trim();
+
+        const body = new FormData();
+        body.append('doc', JSON.stringify(doc));
+        const file = $('image').files[0];
+        if (file) body.append('image', file);
+        else if (!editing) return say('Yeni proje için görsel gerekli.');
+
+        $('save').disabled = true;
+        say('Yayına alınıyor…', true);
+        try {
+          await api('/projects', { method: 'POST', body });
+          say('Yayında.', true);
+          $('reset').click();
+          load();
+        } catch (err) {
+          say(err.message);
+        } finally {
+          $('save').disabled = false;
+        }
+      };
+
+      api('/session').then((s) => show(s.signedIn)).catch(() => show(false));
+    </script>
+  </body>
+</html>
