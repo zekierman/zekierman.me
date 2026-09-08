@@ -40,7 +40,9 @@ function ask(question) {
       hide = false;
       rl.close();
       process.stdout.write('\n');
-      resolve(answer);
+      // Trimmed here and in the login handler, so both ends agree. A pasted
+      // password routinely carries a trailing space that only one of the two keeps.
+      resolve(answer.trim());
     });
     hide = true;
   });
