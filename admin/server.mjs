@@ -41,6 +41,11 @@ const PORT = Number(process.env.PORT ?? 4322);
 const HOST = process.env.HOST ?? '127.0.0.1';
 const PUSH = process.env.GIT_PUSH === '1';
 
+// IndexNow: the key is public by design — it is served at /<key>.txt so the
+// search engines can check that whoever pings actually controls this site.
+const INDEXNOW_KEY = '68ccebb1bc2b5e44f3da31b35e280de3';
+const SITE = 'https://zekierman.me';
+
 const SESSION_HOURS = 12;
 const MAX_UPLOAD = 12 * 1024 * 1024;
 
@@ -255,10 +260,41 @@ async function publish(message) {
       });
     }
     await execFile('npm', ['run', 'build'], { cwd: site, maxBuffer: 8 * 1024 * 1024 });
+    await tellTheIndexes();
   })().finally(() => {
     publishing = null;
   });
   return publishing;
+}
+
+/**
+ * Tells Bing — and through it Copilot, and indirectly the assistants that read
+ * Bing's index — that the pages changed, rather than waiting to be crawled.
+ *
+ * Deliberately unable to fail the publish: the content is already committed and
+ * the site already rebuilt by the time this runs. A search engine being slow or
+ * unreachable is not a reason to report a failed publish to whoever just added a
+ * project.
+ */
+async function tellTheIndexes() {
+  const payload = JSON.stringify({
+    host: new URL(SITE).host,
+    key: INDEXNOW_KEY,
+    keyLocation: `${SITE}/${INDEXNOW_KEY}.txt`,
+    urlList: [`${SITE}/`, `${SITE}/en/`],
+  });
+
+  try {
+    const response = await fetch('https://api.indexnow.org/indexnow', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json; charset=utf-8' },
+      body: payload,
+      signal: AbortSignal.timeout(8000),
+    });
+    console.log(`indexnow: ${response.status}`);
+  } catch (error) {
+    console.warn(`indexnow: could not reach it (${error.name})`);
+  }
 }
 
 // ---------------------------------------------------------------------------
